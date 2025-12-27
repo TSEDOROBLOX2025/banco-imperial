@@ -64,7 +64,6 @@
         .avatar { width: 45px; height: 45px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; }
         
         .balance-card { background: var(--card-gradient); border-radius: 24px; padding: 25px; color: white; margin-bottom: 25px; position: relative; overflow: hidden; cursor: pointer; }
-        .balance-card::after { content: ''; position: absolute; right: -20px; bottom: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; }
         .balance-val { font-size: 1.8rem; font-weight: 800; margin: 8px 0; letter-spacing: -0.5px; }
 
         .actions-scroll { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
@@ -72,19 +71,18 @@
         .icon-circle { width: 55px; height: 55px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; }
         .action-btn span { font-size: 0.75rem; font-weight: 600; color: var(--text-dim); }
 
-        .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; }
         .card-preview { width: 100%; height: 180px; border-radius: 20px; padding: 20px; color: white; background: var(--card-gradient); position: relative; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 10px 20px rgba(130,10,209,0.2); margin-bottom: 20px;}
 
         .internal-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 100; display: none; padding: 24px; overflow-y: auto; }
         .internal-page.active { display: block; animation: slideUp 0.4s ease; }
         .back-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
-        .back-bar i { font-size: 1.5rem; cursor: pointer; }
 
         .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--surface); border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); }
         .trans-info { display: flex; align-items: center; gap: 12px; }
         .trans-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--primary); }
 
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; opacity: 0; transition: 0.3s; z-index: 1000; pointer-events: none; text-align: center; min-width: 200px; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; opacity: 0; transition: 0.3s; z-index: 1000; pointer-events: none; }
         #toast.show { opacity: 1; bottom: 50px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -109,7 +107,7 @@
                     <div class="tab" onclick="switchAuthTab('register', event)">Criar Conta</div>
                 </div>
 
-                               <div id="auth-login">
+                <div id="auth-login">
                     <input type="text" id="login-cpf" placeholder="CPF" oninput="maskCPF(this)">
                     <input type="password" id="login-pass" placeholder="Sua Senha">
                     <button class="btn btn-primary" onclick="handleLogin()">Acessar Conta <i class="fas fa-arrow-right"></i></button>
@@ -121,6 +119,7 @@
                     <input type="password" id="reg-pass" placeholder="Crie uma Senha">
                     <button class="btn btn-primary" onclick="handleRegister()">Abrir minha conta <i class="fas fa-magic"></i></button>
                 </div>
+            </div>
 
             <div style="text-align: center; margin-top: 40px;">
                 <button class="btn" onclick="toggleTheme()" style="background: none; color: var(--text-dim); margin: 0 auto;">
@@ -138,9 +137,7 @@
                         <strong id="dash-name">Carregando...</strong>
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="icon-circle" style="width: 40px; height: 40px;" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i></button>
-                </div>
+                <button class="icon-circle" style="width: 40px; height: 40px;" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
             <div class="balance-card" onclick="toggleBalance()">
@@ -158,10 +155,6 @@
                 <div class="action-btn" onclick="openInternal('page-pix')">
                     <div class="icon-circle"><i class="fas fa-pix"></i></div>
                     <span>Área Pix</span>
-                </div>
-                <div class="action-btn" onclick="openInternal('page-transfer')">
-                    <div class="icon-circle"><i class="fas fa-exchange-alt"></i></div>
-                    <span>Transferir</span>
                 </div>
                 <div class="action-btn" onclick="openInternal('page-boletos')">
                     <div class="icon-circle"><i class="fas fa-barcode"></i></div>
@@ -183,25 +176,9 @@
                     <div class="icon-circle"><i class="fas fa-qrcode"></i></div>
                     <span>Receber</span>
                 </div>
-                <div class="action-btn" onclick="toast('Em breve!')">
-                    <div class="icon-circle"><i class="fas fa-ellipsis-h"></i></div>
-                    <span>Mais</span>
-                </div>
             </div>
 
-            <div class="section-title">Meus cartões</div>
-            <div class="card-preview" onclick="openInternal('page-cards')">
-                <div style="display: flex; justify-content: space-between;">
-                    <i class="fas fa-microchip" style="font-size: 1.5rem; color: #ffd700;"></i>
-                    <i class="fab fa-mastercard" style="font-size: 2rem; opacity: 0.8;"></i>
-                </div>
-                <div>
-                    <p style="font-size: 0.7rem; opacity: 0.8; margin-bottom: 5px;">Cartão Virtual</p>
-                    <p style="letter-spacing: 2px; font-weight: 600;" id="card-num-preview">•••• •••• •••• 0000</p>
-                </div>
-            </div>
-
-            <div class="section-title" style="margin-top: 30px;">Histórico recente</div>
+            <div class="section-title">Histórico recente</div>
             <div id="dash-history"></div>
         </section>
 
@@ -211,19 +188,10 @@
                 <h2 style="font-weight: 800;">Transferir via Pix</h2>
             </div>
             <div class="auth-card glass">
-                <p style="margin-bottom: 15px; font-weight: 600;">Qual a chave Pix (CPF)?</p>
-                <input type="text" id="pix-dest" placeholder="000.000.000-00" oninput="maskCPF(this)">
-                <input type="number" id="pix-val" placeholder="R$ 0,00">
-                <button class="btn btn-primary" onclick="executeTransfer()">Confirmar Transferência</button>
+                <input type="text" id="pix-dest" placeholder="CPF do destinatário" oninput="maskCPF(this)">
+                <input type="number" id="pix-val" placeholder="Valor R$">
+                <button class="btn btn-primary" onclick="executeTransfer()">Confirmar</button>
             </div>
-        </div>
-
-        <div id="page-transfer" class="internal-page">
-            <div class="back-bar">
-                <i class="fas fa-chevron-left" onclick="closeInternal()"></i>
-                <h2 style="font-weight: 800;">Transferência Bancária</h2>
-            </div>
-            <p>Utilize a aba Pix para transferências instantâneas.</p>
         </div>
 
         <div id="page-boletos" class="internal-page">
@@ -231,29 +199,17 @@
                 <i class="fas fa-chevron-left" onclick="closeInternal()"></i>
                 <h2 style="font-weight: 800;">Boletos</h2>
             </div>
-            <div class="tabs">
-                <div class="tab active" id="tab-pay-bol" onclick="switchBoletoMode('pay')">Pagar</div>
-                <div class="tab" id="tab-gen-bol" onclick="switchBoletoMode('gen')">Gerar</div>
-            </div>
-            <div id="bol-pay-area">
-                <input type="text" id="bol-code" placeholder="Código do boleto">
-                <input type="number" id="bol-amount" placeholder="Valor">
-                <button class="btn btn-primary" onclick="payBoleto()">Pagar Agora</button>
-            </div>
-            <div id="bol-gen-area" style="display: none;">
-                <input type="text" id="bol-desc" placeholder="Descrição (ex: Aluguel)">
-                <input type="number" id="bol-val-gen" placeholder="Valor">
-                <button class="btn btn-primary" onclick="toast('Boleto gerado com sucesso!')">Gerar Boleto</button>
-            </div>
+            <input type="number" id="bol-amount" placeholder="Valor do Boleto">
+            <button class="btn btn-primary" onclick="payBoleto()">Pagar Agora</button>
         </div>
 
         <div id="page-vault" class="internal-page">
             <div class="back-bar">
                 <i class="fas fa-chevron-left" onclick="closeInternal()"></i>
-                <h2 style="font-weight: 800;">Minhas Caixinhas</h2>
+                <h2 style="font-weight: 800;">Cofre</h2>
             </div>
             <div class="balance-card" style="background: #333;">
-                <p>Total guardado</p>
+                <p>No cofre:</p>
                 <div class="balance-val" id="vault-total">R$ 0,00</div>
             </div>
             <input type="number" id="vault-input" placeholder="R$ 0,00">
@@ -268,62 +224,43 @@
                 <i class="fas fa-chevron-left" onclick="closeInternal()"></i>
                 <h2 style="font-weight: 800;">Investimentos</h2>
             </div>
-            <div class="transaction-item">
-                <div class="trans-info">
-                    <div class="trans-icon"><i class="fas fa-university"></i></div>
-                    <div>
-                        <strong>Tesouro Imperial</strong>
-                        <p style="font-size: 0.7rem;">Risco Médio | 15% de chance de prejuízo</p>
-                    </div>
-                </div>
-            </div>
-            <input type="number" id="inv-amount" placeholder="Quanto deseja investir?">
-            <button class="btn btn-primary" onclick="executeInvest()">Aplicar Capital</button>
+            <p style="margin-bottom: 20px;">Tesouro Imperial: 85% de chance de lucro (10%) ou 15% de perda (20%).</p>
+            <input type="number" id="inv-amount" placeholder="Valor">
+            <button class="btn btn-primary" onclick="executeInvest()">Investir</button>
         </div>
 
         <div id="page-cards" class="internal-page">
             <div class="back-bar">
                 <i class="fas fa-chevron-left" onclick="closeInternal()"></i>
-                <h2 style="font-weight: 800;">Cartões</h2>
+                <h2 style="font-weight: 800;">Cartão</h2>
             </div>
             <div class="card-preview">
-                <div style="display: flex; justify-content: space-between;">
-                    <i class="fas fa-microchip" style="font-size: 1.5rem; color: #ffd700;"></i>
-                    <i class="fab fa-mastercard" style="font-size: 2.5rem; opacity: 0.9;"></i>
-                </div>
-                <div>
-                    <p style="letter-spacing: 3px; font-size: 1.2rem; margin-bottom: 10px;" id="card-full-num">0000 0000 0000 0000</p>
-                    <div style="display: flex; gap: 20px; font-size: 0.8rem; opacity: 0.8;">
-                        <span>VALIDADE: 12/29</span>
-                        <span>CVV: 554</span>
-                    </div>
-                </div>
+                <div><i class="fab fa-mastercard" style="font-size: 2rem;"></i></div>
+                <p id="card-full-num">0000 0000 0000 0000</p>
+                <p>VALIDADE: 12/29</p>
             </div>
-            <p style="color: var(--text-dim); font-size: 0.8rem; text-align: center;">Cartão virtual protegido para compras RP.</p>
         </div>
 
         <div id="page-receive" class="internal-page">
             <div class="back-bar">
                 <i class="fas fa-chevron-left" onclick="closeInternal()"></i>
-                <h2 style="font-weight: 800;">Receber via Pix</h2>
+                <h2 style="font-weight: 800;">Receber</h2>
             </div>
             <div class="auth-card glass" style="text-align: center;">
-                <i class="fas fa-qrcode" style="font-size: 8rem; margin: 20px 0;"></i>
-                <p>Minha Chave CPF:</p>
-                <strong id="receive-cpf" style="font-size: 1.2rem;">000.000.000-00</strong>
-                <button class="btn btn-primary" style="margin-top: 20px; background: var(--bg); color: var(--primary);" onclick="copyPix()">Copiar Chave Pix</button>
+                <i class="fas fa-qrcode" style="font-size: 6rem; margin-bottom: 20px;"></i>
+                <p>Sua chave Pix:</p>
+                <strong id="receive-cpf">000.000.000-00</strong><br><br>
+                <button class="btn btn-primary" onclick="copyPix()">Copiar Chave</button>
             </div>
         </div>
-
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <script>
-        const firebaseConfig = {
-            databaseURL: "https://banco-imperial-default-rtdb.firebaseio.com/"
-        };
+        // CONFIGURAÇÃO FIREBASE
+        const firebaseConfig = { databaseURL: "https://banco-imperial-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -332,6 +269,7 @@
         const ADMIN_CPF = "123.456.789-01";
         const ADMIN_PASS = "172244";
 
+        // AUXILIARES
         function toast(msg) {
             const t = document.getElementById('toast');
             t.innerText = msg;
@@ -347,6 +285,10 @@
             i.value = v;
         }
 
+        function formatBRL(val) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
+        }
+
         function switchAuthTab(tab, event) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.currentTarget.classList.add('active');
@@ -357,35 +299,22 @@
         function openInternal(id) { document.getElementById(id).classList.add('active'); }
         function closeInternal() { document.querySelectorAll('.internal-page').forEach(p => p.classList.remove('active')); }
 
-        function formatBRL(val) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
-        }
-
-               const ADMIN_CPF = "123.456.789-01";
-        const ADMIN_PASS = "172244";
-
+        // LOGICA DE CONTA
         async function handleRegister() {
             const name = document.getElementById('reg-name').value;
             const cpf = document.getElementById('reg-cpf').value;
             const pass = document.getElementById('reg-pass').value;
             const id = cpf.replace(/\D/g, '');
 
-            if(!name || id.length < 11 || pass.length < 4) {
-                return toast("Preencha tudo! Senha min. 4 dígitos.");
-            }
+            if(!name || id.length < 11 || pass.length < 4) return toast("Dados inválidos!");
 
-            // Usamos 'accounts/' para anular as contas antigas de 'users/'
-            const snapshot = await db.ref('accounts/' + id).once('value');
-            if(snapshot.exists()) return toast("CPF já cadastrado!");
+            const snap = await db.ref('accounts/' + id).once('value');
+            if(snap.exists()) return toast("CPF já cadastrado!");
 
             const newUser = {
-                name,
-                cpf,
-                password: pass, // Nova camada de segurança
-                balance: 10000,
-                vault: 0,
-                history: [{ type: 'in', title: 'Abertura de Conta', amount: 10000, date: Date.now() }],
-                cards: { num: "4452 " + Math.floor(1000 + Math.random() * 9000) + " 9920 4452" }
+                name, cpf, password: pass, balance: 10000, vault: 0,
+                history: [{ type: 'in', title: 'Bônus de Boas-vindas', amount: 10000, date: Date.now() }],
+                cards: { num: "4452 " + Math.floor(1000 + Math.random() * 9000) + " 8821 4452" }
             };
 
             await db.ref('accounts/' + id).set(newUser);
@@ -397,30 +326,16 @@
             const passInput = document.getElementById('login-pass').value;
             const id = cpfInput.replace(/\D/g, '');
 
-            // LOGIN ESPECIAL DO TUTU (DONO)
             if(cpfInput === ADMIN_CPF && passInput === ADMIN_PASS) {
-                login({
-                    name: "Tutu Protásio",
-                    cpf: ADMIN_CPF,
-                    balance: 1500000000000,
-                    isAdmin: true,
-                    vault: 0,
-                    history: [{ type: 'in', title: 'Saldo Imperial', amount: 1500000000000, date: Date.now() }],
-                    cards: { num: "0001 0001 0001 0001" }
-                });
+                login({ name: "Tutu Protásio", cpf: ADMIN_CPF, balance: 999999999, isAdmin: true, vault: 0, cards: {num:"0001 0001 0001 0001"}, history: [] });
                 return;
             }
 
-            const snapshot = await db.ref('accounts/' + id).once('value');
-            if(snapshot.exists()) {
-                const user = snapshot.val();
-                if(user.password === passInput) {
-                    login(user);
-                } else {
-                    toast("Senha incorreta!");
-                }
+            const snap = await db.ref('accounts/' + id).once('value');
+            if(snap.exists() && snap.val().password === passInput) {
+                login(snap.val());
             } else {
-                toast("Conta não encontrada!");
+                toast("Dados incorretos!");
             }
         }
 
@@ -433,7 +348,6 @@
                 document.body.classList.add('owner-mode');
                 updateUI();
             } else {
-                // Sincronização na nova rota 'accounts'
                 db.ref('accounts/' + currentUser.cpf.replace(/\D/g, '')).on('value', snap => {
                     if(snap.exists()) {
                         currentUser = snap.val();
@@ -441,157 +355,120 @@
                     }
                 });
             }
-            toast("Conectado com segurança!");
         }
 
         function updateUI() {
             document.getElementById('dash-name').innerText = currentUser.name;
             document.getElementById('dash-avatar').innerText = currentUser.name.charAt(0);
             document.getElementById('receive-cpf').innerText = currentUser.cpf;
-            document.getElementById('card-num-preview').innerText = "•••• " + currentUser.cards.num.slice(-4);
             document.getElementById('card-full-num').innerText = currentUser.cards.num;
-            document.getElementById('vault-total').innerText = formatBRL(currentUser.vault || 0);
-
-            if(!isBalanceHidden) {
-                document.getElementById('dash-balance').innerText = formatBRL(currentUser.balance);
-            }
+            document.getElementById('vault-total').innerText = formatBRL(currentUser.vault);
+            if(!isBalanceHidden) document.getElementById('dash-balance').innerText = formatBRL(currentUser.balance);
 
             const histArea = document.getElementById('dash-history');
             histArea.innerHTML = "";
-            const history = (currentUser.history || []).slice(-10).reverse();
-            
-            history.forEach(t => {
+            (currentUser.history || []).slice(-10).reverse().forEach(t => {
                 histArea.innerHTML += `
                     <div class="transaction-item">
                         <div class="trans-info">
                             <div class="trans-icon"><i class="fas ${t.type === 'in' ? 'fa-arrow-down' : 'fa-arrow-up'}"></i></div>
-                            <div>
-                                <strong>${t.title}</strong>
-                                <p style="font-size: 0.7rem; color: var(--text-dim);">${new Date(t.date).toLocaleDateString()}</p>
-                            </div>
+                            <div><strong>${t.title}</strong><p style="font-size:0.7rem">${new Date(t.date).toLocaleDateString()}</p></div>
                         </div>
-                        <strong style="color: ${t.type === 'in' ? 'var(--success)' : 'var(--text)'}">
-                            ${t.type === 'in' ? '+' : '-'} ${formatBRL(t.amount)}
-                        </strong>
-                    </div>
-                `;
+                        <strong style="color: ${t.type === 'in' ? 'var(--success)' : 'var(--text)'}">${t.type === 'in' ? '+' : '-'} ${formatBRL(t.amount)}</strong>
+                    </div>`;
             });
         }
 
         function toggleBalance() {
             isBalanceHidden = !isBalanceHidden;
-            const btn = document.getElementById('balance-eye');
-            btn.className = isBalanceHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+            document.getElementById('balance-eye').className = isBalanceHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
             document.getElementById('dash-balance').innerText = isBalanceHidden ? '••••••••' : formatBRL(currentUser.balance);
         }
 
+        // OPERAÇÕES BANCÁRIAS (CORRIGIDAS PARA 'accounts/')
         async function executeTransfer() {
             const destCpf = document.getElementById('pix-dest').value.replace(/\D/g, '');
             const amount = parseFloat(document.getElementById('pix-val').value);
-
-            if(!amount || amount <= 0) return toast("Valor inválido!");
-            if(amount > currentUser.balance) return toast("Saldo insuficiente!");
-
-            const destSnap = await db.ref('users/' + destCpf).once('value');
-            if(!destSnap.exists()) return toast("CPF não encontrado!");
-            
-            const destData = destSnap.val();
             const senderId = currentUser.cpf.replace(/\D/g, '');
 
-            // Atualiza Remetente
-            await db.ref('users/' + senderId).update({
+            if(!amount || amount > currentUser.balance) return toast("Saldo insuficiente!");
+            if(destCpf === senderId) return toast("Não pode transferir para si mesmo!");
+
+            const destSnap = await db.ref('accounts/' + destCpf).once('value');
+            if(!destSnap.exists()) return toast("Destinatário não encontrado!");
+
+            const destData = destSnap.val();
+
+            // Saída
+            await db.ref('accounts/' + senderId).update({
                 balance: currentUser.balance - amount,
                 history: [...(currentUser.history || []), { type: 'out', title: 'Pix para ' + destData.name, amount, date: Date.now() }]
             });
 
-            // Atualiza Destinatário
-            await db.ref('users/' + destCpf).update({
+            // Entrada
+            await db.ref('accounts/' + destCpf).update({
                 balance: destData.balance + amount,
                 history: [...(destData.history || []), { type: 'in', title: 'Pix de ' + currentUser.name, amount, date: Date.now() }]
             });
 
-            toast("Transferência concluída!");
+            toast("Sucesso!");
             closeInternal();
-            document.getElementById('pix-val').value = "";
         }
 
         async function manageVault(mode) {
             const amount = parseFloat(document.getElementById('vault-input').value);
             if(!amount || amount <= 0) return;
+            const id = currentUser.cpf.replace(/\D/g, '');
 
-            let newBal = currentUser.balance;
-            let newVault = currentUser.vault || 0;
-
-            if(mode === 'in') {
-                if(amount > newBal) return toast("Saldo insuficiente!");
-                newBal -= amount;
-                newVault += amount;
+            if(mode === 'in' && amount <= currentUser.balance) {
+                await db.ref('accounts/' + id).update({ balance: currentUser.balance - amount, vault: (currentUser.vault || 0) + amount });
+            } else if(mode === 'out' && amount <= currentUser.vault) {
+                await db.ref('accounts/' + id).update({ balance: currentUser.balance + amount, vault: (currentUser.vault || 0) - amount });
             } else {
-                if(amount > newVault) return toast("Cofre insuficiente!");
-                newBal += amount;
-                newVault -= amount;
+                return toast("Saldo insuficiente!");
             }
-
-            await db.ref('users/' + currentUser.cpf.replace(/\D/g, '')).update({
-                balance: newBal,
-                vault: newVault
-            });
             toast("Cofre atualizado!");
-            document.getElementById('vault-input').value = "";
         }
 
         async function executeInvest() {
             const amount = parseFloat(document.getElementById('inv-amount').value);
-            if(!amount || amount > currentUser.balance || amount <= 0) return toast("Saldo insuficiente!");
-
+            if(!amount || amount > currentUser.balance) return toast("Saldo insuficiente!");
+            
             const win = Math.random() > 0.15;
             const result = win ? amount * 0.1 : -(amount * 0.2);
-            
-            await db.ref('users/' + currentUser.cpf.replace(/\D/g, '')).update({
-                balance: currentUser.balance + result,
-                history: [...(currentUser.history || []), { 
-                    type: win ? 'in' : 'out', 
-                    title: win ? 'Lucro Investimento' : 'Prejuízo Investimento', 
-                    amount: Math.abs(result), 
-                    date: Date.now() 
-                }]
-            });
+            const id = currentUser.cpf.replace(/\D/g, '');
 
-            toast(win ? "Você lucrou " + formatBRL(result) : "Você perdeu " + formatBRL(Math.abs(result)));
+            await db.ref('accounts/' + id).update({
+                balance: currentUser.balance + result,
+                history: [...(currentUser.history || []), { type: win?'in':'out', title: win?'Lucro Invest.':'Perda Invest.', amount: Math.abs(result), date: Date.now() }]
+            });
+            toast(win ? "Lucro!" : "Prejuízo!");
             closeInternal();
         }
 
         async function payBoleto() {
             const amount = parseFloat(document.getElementById('bol-amount').value);
             if(!amount || amount > currentUser.balance) return toast("Saldo insuficiente!");
+            const id = currentUser.cpf.replace(/\D/g, '');
 
-            await db.ref('users/' + currentUser.cpf.replace(/\D/g, '')).update({
+            await db.ref('accounts/' + id).update({
                 balance: currentUser.balance - amount,
                 history: [...(currentUser.history || []), { type: 'out', title: 'Pagamento Boleto', amount, date: Date.now() }]
             });
-            toast("Boleto pago!");
+            toast("Pago!");
             closeInternal();
         }
 
-        function switchBoletoMode(mode) {
-            document.getElementById('tab-pay-bol').classList.toggle('active', mode === 'pay');
-            document.getElementById('tab-gen-bol').classList.toggle('active', mode === 'gen');
-            document.getElementById('bol-pay-area').style.display = mode === 'pay' ? 'block' : 'none';
-            document.getElementById('bol-gen-area').style.display = mode === 'gen' ? 'block' : 'none';
-        }
-
-        function copyPix() {
-            navigator.clipboard.writeText(currentUser.cpf);
-            toast("Chave Pix copiada!");
-        }
-
+        function copyPix() { navigator.clipboard.writeText(currentUser.cpf); toast("Copiado!"); }
+        
         function toggleTheme() {
             const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             document.body.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
         }
-
-        if(localStorage.getItem('theme') === 'dark') toggleTheme();
+        if(localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        }
     </script>
 </body>
 </html>
