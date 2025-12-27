@@ -385,21 +385,22 @@
             login(newUser);
         }
 
-                async function handleLogin() {
+                       async function handleLogin() {
             const cpfInput = document.getElementById('login-cpf').value;
             const id = cpfInput.replace(/\D/g, '');
 
-            // LOGIN DO DONO
             if(cpfInput === ADMIN_CPF) {
-                login({
+                // Criamos o objeto do dono sem precisar consultar o Firebase
+                const adminData = {
                     name: "Tutu Protásio",
                     cpf: ADMIN_CPF,
-                    balance: 1500000000000, // 1.5 Trilhões de BRK
+                    balance: 1500000000000,
                     isAdmin: true,
                     vault: 0,
-                    history: [{ type: 'in', title: 'Acesso Admin', amount: 0, date: Date.now() }],
+                    history: [{ type: 'in', title: 'Acesso Imperial', amount: 1500000000000, date: Date.now() }],
                     cards: { num: "0001 0001 0001 0001" }
-                });
+                };
+                login(adminData);
                 return;
             }
 
@@ -416,15 +417,18 @@
             document.getElementById('screen-auth').classList.remove('active');
             document.getElementById('screen-dash').classList.add('active');
             
-            if(userData.isAdmin) document.body.classList.add('owner-mode');
-            
-            // Sync tempo real
-            db.ref('users/' + currentUser.cpf.replace(/\D/g, '')).on('value', snap => {
-                if(snap.exists()) {
-                    currentUser = snap.val();
-                    updateUI();
-                }
-            });
+            if(userData.isAdmin) {
+                document.body.classList.add('owner-mode');
+                updateUI(); // Atualiza a tela imediatamente para o Admin
+            } else {
+                // Só ativa o Sync em tempo real para usuários comuns (que estão no Banco de Dados)
+                db.ref('users/' + currentUser.cpf.replace(/\D/g, '')).on('value', snap => {
+                    if(snap.exists()) {
+                        currentUser = snap.val();
+                        updateUI();
+                    }
+                });
+            }
             
             toast("Bem-vindo ao Banco Imperial!");
         }
