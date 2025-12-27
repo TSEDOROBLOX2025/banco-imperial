@@ -385,15 +385,16 @@
             login(newUser);
         }
 
-        async function handleLogin() {
+                async function handleLogin() {
             const cpfInput = document.getElementById('login-cpf').value;
             const id = cpfInput.replace(/\D/g, '');
 
+            // LOGIN DO DONO
             if(cpfInput === ADMIN_CPF) {
                 login({
                     name: "Tutu Protásio",
                     cpf: ADMIN_CPF,
-                    balance: 99999999,
+                    balance: 1500000000000, // 1.5 Trilhões de BRK
                     isAdmin: true,
                     vault: 0,
                     history: [{ type: 'in', title: 'Acesso Admin', amount: 0, date: Date.now() }],
