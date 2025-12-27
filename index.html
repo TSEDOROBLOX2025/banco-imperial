@@ -219,15 +219,22 @@
             </div>
         </div>
 
-        <div id="page-invest" class="internal-page">
-            <div class="back-bar">
-                <i class="fas fa-chevron-left" onclick="closeInternal()"></i>
-                <h2 style="font-weight: 800;">Investimentos</h2>
-            </div>
-            <p style="margin-bottom: 20px;">Tesouro Imperial: 85% de chance de lucro (10%) ou 15% de perda (20%).</p>
-            <input type="number" id="inv-amount" placeholder="Valor">
-            <button class="btn btn-primary" onclick="executeInvest()">Investir</button>
-        </div>
+       <div id="page-invest" class="internal-page">
+    <div class="back-bar">
+        <i class="fas fa-chevron-left" onclick="closeInternal()"></i>
+        <h2 style="font-weight: 800;">Investimentos</h2>
+    </div>
+    <div class="glass" style="padding: 20px; border-radius: 20px; margin-bottom: 20px; border-left: 5px solid var(--danger);">
+        <strong style="color: var(--danger);">ALTO RISCO</strong>
+        <p style="font-size: 0.85rem; margin-top: 10px; color: var(--text-dim);">
+            O Tesouro Imperial é extremamente volátil. 
+            <br>• Chance de Lucro: <b>15%</b>
+            <br>• Risco de Perda: <b>85%</b>
+        </p>
+    </div>
+    <input type="number" id="inv-amount" placeholder="Quanto deseja arriscar?">
+    <button class="btn btn-primary" style="background: var(--danger);" onclick="executeInvest()">Confirmar Aposta</button>
+</div>
 
         <div id="page-cards" class="internal-page">
             <div class="back-bar">
