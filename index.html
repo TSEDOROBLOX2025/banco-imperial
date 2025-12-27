@@ -431,20 +431,46 @@
         }
 
         async function executeInvest() {
-            const amount = parseFloat(document.getElementById('inv-amount').value);
-            if(!amount || amount > currentUser.balance) return toast("Saldo insuficiente!");
-            
-            const win = Math.random() > 0.15;
-            const result = win ? amount * 0.1 : -(amount * 0.2);
-            const id = currentUser.cpf.replace(/\D/g, '');
+    const amount = parseFloat(document.getElementById('inv-amount').value);
+    
+    // Validações básicas
+    if(!amount || amount <= 0) return toast("Digite um valor válido!");
+    if(amount > currentUser.balance) return toast("Saldo insuficiente!");
 
-            await db.ref('accounts/' + id).update({
-                balance: currentUser.balance + result,
-                history: [...(currentUser.history || []), { type: win?'in':'out', title: win?'Lucro Invest.':'Perda Invest.', amount: Math.abs(result), date: Date.now() }]
-            });
-            toast(win ? "Lucro!" : "Prejuízo!");
-            closeInternal();
-        }
+    // LÓGICA DE RISCO: 
+    // Math.random() gera um número entre 0 e 1.
+    // > 0.85 significa que ele tem apenas 15% de chance de ganhar.
+    const win = Math.random() > 0.85; 
+    
+    let result;
+    let title;
+
+    if (win) {
+        result = amount * 0.5; // Lucro de 50% sobre o valor investido
+        title = "Lucro: Tesouro Imperial";
+        toast("Sorte grande! Você lucrou " + formatBRL(result));
+    } else {
+        result = -(amount * 0.3); // Perda de 30% do valor investido
+        title = "Prejuízo: Tesouro Imperial";
+        toast("Você perdeu " + formatBRL(Math.abs(result)) + " no investimento.");
+    }
+
+    const id = currentUser.cpf.replace(/\D/g, '');
+
+    // Atualiza no Firebase
+    await db.ref('accounts/' + id).update({
+        balance: currentUser.balance + result,
+        history: [...(currentUser.history || []), { 
+            type: win ? 'in' : 'out', 
+            title: title, 
+            amount: Math.abs(result), 
+            date: Date.now() 
+        }]
+    });
+
+    closeInternal();
+    document.getElementById('inv-amount').value = "";
+}
 
         async function payBoleto() {
             const amount = parseFloat(document.getElementById('bol-amount').value);
