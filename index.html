@@ -330,6 +330,7 @@
         let currentUser = null;
         let isBalanceHidden = false;
         const ADMIN_CPF = "123.456.789-01";
+        const ADMIN_PASS = "172244";
 
         function toast(msg) {
             const t = document.getElementById('toast');
@@ -360,54 +361,64 @@
             return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
         }
 
+               const ADMIN_CPF = "123.456.789-01";
+        const ADMIN_PASS = "172244";
+
         async function handleRegister() {
             const name = document.getElementById('reg-name').value;
             const cpf = document.getElementById('reg-cpf').value;
+            const pass = document.getElementById('reg-pass').value;
             const id = cpf.replace(/\D/g, '');
 
-            if(!name || id.length < 11) return toast("Preencha todos os campos!");
-
-            const snapshot = await db.ref('users/' + id).once('value');
-            if(snapshot.exists()) {
-                toast("CPF já cadastrado!");
-                return;
+            if(!name || id.length < 11 || pass.length < 4) {
+                return toast("Preencha tudo! Senha min. 4 dígitos.");
             }
+
+            // Usamos 'accounts/' para anular as contas antigas de 'users/'
+            const snapshot = await db.ref('accounts/' + id).once('value');
+            if(snapshot.exists()) return toast("CPF já cadastrado!");
 
             const newUser = {
                 name,
                 cpf,
+                password: pass, // Nova camada de segurança
                 balance: 10000,
                 vault: 0,
-                history: [{ type: 'in', title: 'Bônus Inicial', amount: 10000, date: Date.now() }],
+                history: [{ type: 'in', title: 'Abertura de Conta', amount: 10000, date: Date.now() }],
                 cards: { num: "4452 " + Math.floor(1000 + Math.random() * 9000) + " 9920 4452" }
             };
 
-            await db.ref('users/' + id).set(newUser);
+            await db.ref('accounts/' + id).set(newUser);
             login(newUser);
         }
 
-                       async function handleLogin() {
+        async function handleLogin() {
             const cpfInput = document.getElementById('login-cpf').value;
+            const passInput = document.getElementById('login-pass').value;
             const id = cpfInput.replace(/\D/g, '');
 
-            if(cpfInput === ADMIN_CPF) {
-                // Criamos o objeto do dono sem precisar consultar o Firebase
-                const adminData = {
+            // LOGIN ESPECIAL DO TUTU (DONO)
+            if(cpfInput === ADMIN_CPF && passInput === ADMIN_PASS) {
+                login({
                     name: "Tutu Protásio",
                     cpf: ADMIN_CPF,
                     balance: 1500000000000,
                     isAdmin: true,
                     vault: 0,
-                    history: [{ type: 'in', title: 'Acesso Imperial', amount: 1500000000000, date: Date.now() }],
+                    history: [{ type: 'in', title: 'Saldo Imperial', amount: 1500000000000, date: Date.now() }],
                     cards: { num: "0001 0001 0001 0001" }
-                };
-                login(adminData);
+                });
                 return;
             }
 
-            const snapshot = await db.ref('users/' + id).once('value');
+            const snapshot = await db.ref('accounts/' + id).once('value');
             if(snapshot.exists()) {
-                login(snapshot.val());
+                const user = snapshot.val();
+                if(user.password === passInput) {
+                    login(user);
+                } else {
+                    toast("Senha incorreta!");
+                }
             } else {
                 toast("Conta não encontrada!");
             }
@@ -420,18 +431,17 @@
             
             if(userData.isAdmin) {
                 document.body.classList.add('owner-mode');
-                updateUI(); // Atualiza a tela imediatamente para o Admin
+                updateUI();
             } else {
-                // Só ativa o Sync em tempo real para usuários comuns (que estão no Banco de Dados)
-                db.ref('users/' + currentUser.cpf.replace(/\D/g, '')).on('value', snap => {
+                // Sincronização na nova rota 'accounts'
+                db.ref('accounts/' + currentUser.cpf.replace(/\D/g, '')).on('value', snap => {
                     if(snap.exists()) {
                         currentUser = snap.val();
                         updateUI();
                     }
                 });
             }
-            
-            toast("Bem-vindo ao Banco Imperial!");
+            toast("Conectado com segurança!");
         }
 
         function updateUI() {
