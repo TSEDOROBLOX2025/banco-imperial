@@ -109,17 +109,18 @@
                     <div class="tab" onclick="switchAuthTab('register', event)">Criar Conta</div>
                 </div>
 
-                <div id="auth-login">
-                    <input type="text" id="login-cpf" placeholder="000.000.000-00" oninput="maskCPF(this)">
+                               <div id="auth-login">
+                    <input type="text" id="login-cpf" placeholder="CPF" oninput="maskCPF(this)">
+                    <input type="password" id="login-pass" placeholder="Sua Senha">
                     <button class="btn btn-primary" onclick="handleLogin()">Acessar Conta <i class="fas fa-arrow-right"></i></button>
                 </div>
 
                 <div id="auth-register" style="display: none;">
                     <input type="text" id="reg-name" placeholder="Nome Completo (RP)">
                     <input type="text" id="reg-cpf" placeholder="CPF (Sua chave Pix)" oninput="maskCPF(this)">
+                    <input type="password" id="reg-pass" placeholder="Crie uma Senha">
                     <button class="btn btn-primary" onclick="handleRegister()">Abrir minha conta <i class="fas fa-magic"></i></button>
                 </div>
-            </div>
 
             <div style="text-align: center; margin-top: 40px;">
                 <button class="btn" onclick="toggleTheme()" style="background: none; color: var(--text-dim); margin: 0 auto;">
