@@ -1,1 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Imperial | Digital Bank RP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #820ad1;
+            --primary-dark: #6a08aa;
+            --bg-light: #ffffff;
+            --bg-dark: #000000;
+            --card-light: #f5f5f5;
+            --card-dark: #121212;
+            --text-light: #111111;
+            --text-dark: #ffffff;
+            --transition: all 0.3s ease;
+        }
+
+        body.light-mode {
+            --bg-color: var(--bg-light);
+            --text-color: var(--text-light);
+            --card-bg: var(--card-light);
+            --input-bg: #eeeeee;
+        }
+
+        body.dark-mode {
+            --bg-color: var(--bg-dark);
+            --text-color: var(--text-dark);
+            --card-bg: var(--card-dark);
+            --input-bg: #1e1e1e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-svg {
+            width: 80px;
+            fill: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        button:hover { background: var(--primary-dark); }
+
+        /* Dashboard */
+        #main-app { display: none; padding: 20px; max-width: 500px; margin: 0 auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .user-info h2 { font-size: 1.2rem; }
+
+        .balance-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        /* Quick Actions */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .action-item span { font-size: 0.8rem; font-weight: 600; }
+
+        /* Virtual Card */
+        .credit-card {
+            background: linear-gradient(135deg, #820ad1 0%, #4e067d 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Transactions */
+        .section-title { margin-bottom: 15px; font-weight: 600; }
+        .transaction-list { display: flex; flex-direction: column; gap: 15px; }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #33333333;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2ecc71;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <div id="toast" class="success-toast">Sucesso!</div>
+
+    <section id="login-screen">
+        <div class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 24 24">
+                <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z" />
+            </svg>
+            <h1>Banco Imperial</h1>
+            <p>Brookasil Roleplay</p>
+        </div>
+        <div class="login-card">
+            <input type="text" id="login-name" placeholder="Nome do Personagem">
+            <input type="text" id="login-cpf" placeholder="CPF (Sua Chave Pix)">
+            <button onclick="handleLogin()">Entrar / Criar Conta</button>
+        </div>
+    </section>
+
+    <main id="main-app">
+        <header>
+            <div class="user-info">
+                <p>Olá, <span id="display-name">Jogador</span></p>
+            </div>
+            <div class="header-actions">
+                <i class="fas fa-moon theme-toggle" onclick="toggleTheme()" id="theme-icon"></i>
+                <i class="fas fa-sign-out-alt" style="margin-left: 20px; cursor: pointer;" onclick="location.reload()"></i>
+            </div>
+        </header>
+
+        <div class="balance-card">
+            <p>Saldo disponível</p>
+            <div class="balance-amount">R$ <span id="user-balance">0,00</span></div>
+        </div>
+
+        <div class="actions-grid">
+            <div class="action-item" onclick="openModal('pix-modal')">
+                <div class="icon-circle"><i class="fas fa-pix"></i></div>
+                <span>Área Pix</span>
+            </div>
+            <div class="action-item" onclick="openModal('invest-modal')">
+                <div class="icon-circle"><i class="fas fa-chart-line"></i></div>
+                <span>Investir</span>
+            </div>
+            <div class="action-item" onclick="openModal('vault-modal')">
+                <div class="icon-circle"><i class="fas fa-box"></i></div>
+                <span>Caixinhas</span>
+            </div>
+            <div class="action-item" onclick="openModal('card-modal')">
+                <div class="icon-circle"><i class="fas fa-credit-card"></i></div>
+                <span>Cartões</span>
+            </div>
+        </div>
+
+        <h3 class="section-title">Últimas transações</h3>
+        <div class="transaction-list" id="history-list">
+            <p style="opacity: 0.5;">Nenhuma transação recente.</p>
+        </div>
+    </main>
+
+    <div id="pix-modal" class="modal">
+        <div class="modal-content">
+            <h3>Enviar Pix</h3>
+            <p style="font-size: 0.8rem; margin-bottom: 15px;">Sua chave: <b id="my-pix-key">---</b></p>
+            <input type="text" id="pix-target" placeholder="CPF do destinatário">
+            <input type="number" id="pix-amount" placeholder="Valor R$">
+            <button onclick="executeTransfer()">Confirmar Envio</button>
+            <button style="background: transparent; color: var(--text-color);" onclick="closeModals()">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="vault-modal" class="modal">
+        <div class="modal-content">
+            <h3>Minhas Caixinhas</h3>
+            <div id="vault-list" style="margin: 15px 0;"></div>
+            <input type="text" id="vault-name" placeholder="Nome da Caixinha">
+            <button onclick="createVault()">Criar Nova Caixinha</button>
+            <button style="background: transparent; color: var(--text-color);" onclick="closeModals()">Voltar</button>
+        </div>
+    </div>
+
+    <div id="card-modal" class="modal">
+        <div class="modal-content">
+            <h3>Cartão Virtual</h3>
+            <div class="credit-card">
+                <div style="display: flex; justify-content: space-between;">
+                    <i class="fas fa-crown" style="font-size: 1.5rem;"></i>
+                    <span>Virtual</span>
+                </div>
+                <div style="font-size: 1.1rem; letter-spacing: 2px;" id="card-num">**** **** **** 1234</div>
+                <div>
+                    <div id="card-holder" style="text-transform: uppercase; font-size: 0.8rem;">NOME DO JOGADOR</div>
+                    <div style="font-size: 0.7rem; opacity: 0.8;">VAL 12/30  CVV 999</div>
+                </div>
+            </div>
+            <button onclick="closeModals()">Fechar</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+        const firebaseConfig = {
+            databaseURL: "https://banco-imperial-default-rtdb.firebaseio.com/",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // State
+        let currentUser = null;
+
+        // --- Auth & Login ---
+        window.handleLogin = async () => {
+            const name = document.getElementById('login-name').value;
+            const cpf = document.getElementById('login-cpf').value.replace(/\D/g,'');
+
+            if(!name || !cpf) return alert("Preencha os dados do RP!");
+
+            const userRef = ref(db, 'users/' + cpf);
+            const snapshot = await get(userRef);
+
+            if (snapshot.exists()) {
+                currentUser = snapshot.val();
+            } else {
+                // Criar novo usuário se não existir
+                currentUser = {
+                    name: name,
+                    cpf: cpf,
+                    balance: 5000, // Saldo inicial RP
+                    history: [],
+                    vaults: []
+                };
+                await set(userRef, currentUser);
+            }
+            
+            startApp();
+        };
+
+        function startApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('display-name').innerText = currentUser.name;
+            document.getElementById('my-pix-key').innerText = currentUser.cpf;
+            document.getElementById('card-holder').innerText = currentUser.name;
+            
+            // Ouvir atualizações em tempo real
+            const userRef = ref(db, 'users/' + currentUser.cpf);
+            onValue(userRef, (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    currentUser = data;
+                    updateUI();
+                }
+            });
+        }
+
+        function updateUI() {
+            document.getElementById('user-balance').innerText = currentUser.balance.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            
+            // Histórico
+            const historyCont = document.getElementById('history-list');
+            historyCont.innerHTML = "";
+            if(currentUser.history) {
+                Object.values(currentUser.history).reverse().slice(0, 5).forEach(t => {
+                    historyCont.innerHTML += `
+                        <div class="transaction-item">
+                            <div>
+                                <strong>${t.type}</strong><br>
+                                <small>${t.target || ''}</small>
+                            </div>
+                            <span style="color: ${t.amount < 0 ? '#e74c3c' : '#2ecc71'}">
+                                ${t.amount < 0 ? '-' : '+'} R$ ${Math.abs(t.amount).toFixed(2)}
+                            </span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // --- Transações ---
+        window.executeTransfer = async () => {
+            const targetCpf = document.getElementById('pix-target').value;
+            const amount = parseFloat(document.getElementById('pix-amount').value);
+
+            if(!targetCpf || isNaN(amount) || amount <= 0) return alert("Dados inválidos");
+            if(amount > currentUser.balance) return alert("Saldo insuficiente");
+            if(targetCpf === currentUser.cpf) return alert("Você não pode enviar para si mesmo");
+
+            const targetRef = ref(db, 'users/' + targetCpf);
+            const targetSnap = await get(targetRef);
+
+            if(!targetSnap.exists()) return alert("Chave Pix não encontrada!");
+
+            const targetData = targetSnap.val();
+
+            // Atualizar Remetente
+            const newHistorySender = currentUser.history ? [...Object.values(currentUser.history)] : [];
+            newHistorySender.push({type: 'Transferência Enviada', amount: -amount, target: targetData.name, date: Date.now()});
+            
+            await update(ref(db, 'users/' + currentUser.cpf), {
+                balance: currentUser.balance - amount,
+                history: newHistorySender
+            });
+
+            // Atualizar Destinatário
+            const newHistoryReceiver = targetData.history ? [...Object.values(targetData.history)] : [];
+            newHistoryReceiver.push({type: 'Pix Recebido', amount: amount, target: currentUser.name, date: Date.now()});
+
+            await update(targetRef, {
+                balance: targetData.balance + amount,
+                history: newHistoryReceiver
+            });
+
+            showToast("Pix enviado com sucesso!");
+            closeModals();
+        };
+
+        // --- Caixinhas ---
+        window.createVault = async () => {
+            const name = document.getElementById('vault-name').value;
+            if(!name) return;
+
+            const vaults = currentUser.vaults ? [...Object.values(currentUser.vaults)] : [];
+            vaults.push({name: name, balance: 0});
+
+            await update(ref(db, 'users/' + currentUser.cpf), { vaults: vaults });
+            document.getElementById('vault-name').value = "";
+            showToast("Caixinha criada!");
+        };
+
+        // --- UI Helpers ---
+        window.openModal = (id) => {
+            document.getElementById(id).style.display = 'flex';
+        };
+
+        window.closeModals = () => {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        };
+
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            if(body.classList.contains('dark-mode')) {
+                body.classList.replace('dark-mode', 'light-mode');
+                icon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.replace('light-mode', 'dark-mode');
+                icon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        };
+
+        // Carregar tema salvo
+        if(localStorage.getItem('theme') === 'light') toggleTheme();
+
+    </script>
+</body>
+</html>
 
