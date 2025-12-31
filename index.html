@@ -3,1416 +3,1190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Banco Imperial - O Futuro do Banking Digital">
-    <meta name="theme-color" content="#2E046D">
-    <title>Banco Imperial | Internet Banking Enterprise</title>
+    <title>Banco Imperial | Premium Banking & Store</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
-        /* --- RESET & VARIAVEIS GLOBAIS --- */
+        /* ========================================
+        CORE VARIABLES & THEME
+        ========================================
+        */
         :root {
-            /* Palette Imperial */
-            --color-primary: #2E046D; /* Roxo Imperial Profundo */
-            --color-primary-light: #5e35b1;
-            --color-primary-dark: #20024D;
-            --color-accent: #FFD700; /* Ouro Nobre */
-            --color-success: #00C853;
-            --color-danger: #D50000;
-            --color-warning: #FFAB00;
-            --color-info: #00B0FF;
+            --primary: #6c5ce7;
+            --primary-dark: #4834d4;
+            --secondary: #a29bfe;
+            --accent: #00cec9;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
             
-            /* Neutros */
-            --color-bg: #F4F6F8;
-            --color-surface: #FFFFFF;
-            --color-text-primary: #1A1A1A;
-            --color-text-secondary: #666666;
-            --color-border: #E0E0E0;
-
-            /* Sombras & Efeitos */
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
+            --bg-body: #f4f6f9;
+            --bg-card: #ffffff;
+            --bg-sidebar: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --border: #dfe6e9;
             
-            /* Transições */
-            --transition-fast: 0.2s ease;
-            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 24px rgba(108, 92, 231, 0.1);
+            --shadow-lg: 0 16px 48px rgba(108, 92, 231, 0.15);
+            
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            
+            --font-main: 'Inter', sans-serif;
+            --font-head: 'Poppins', sans-serif;
         }
 
-        /* Acessibilidade - Alto Contraste */
-        body.high-contrast {
-            --color-primary: #000000;
-            --color-primary-light: #333333;
-            --color-bg: #FFFFFF;
-            --color-text-primary: #000000;
-            --color-text-secondary: #000000;
-            --color-accent: #FFFF00;
+        /* DARK THEME OVERRIDES */
+        body.dark-mode {
+            --bg-body: #0f1014;
+            --bg-card: #181920;
+            --bg-sidebar: #131419;
+            --text-main: #dfe6e9;
+            --text-muted: #b2bec3;
+            --border: #2d3436;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
+        /* ========================================
+        RESET & BASE STYLES
+        ========================================
+        */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            background-color: var(--color-bg);
-            color: var(--color-text-primary);
-            font-size: 16px;
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
             overflow-x: hidden;
+            font-size: 14px;
+            height: 100vh;
         }
 
-        /* --- UTILITIES --- */
+        h1, h2, h3, h4, h5 { font-family: var(--font-head); font-weight: 700; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; font-family: inherit; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        /* ========================================
+        UTILITY CLASSES
+        ========================================
+        */
         .hidden { display: none !important; }
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
         .justify-center { justify-content: center; }
-        .w-full { width: 100%; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
         .text-center { text-align: center; }
-        .mt-1 { margin-top: 0.5rem; }
+        .text-primary { color: var(--primary); }
+        .text-danger { color: var(--danger); }
+        .text-success { color: var(--success); }
+        .w-full { width: 100%; }
         .mt-2 { margin-top: 1rem; }
-        .mt-4 { margin-top: 2rem; }
         .mb-2 { margin-bottom: 1rem; }
-        .p-4 { padding: 2rem; }
-        .font-bold { font-weight: 700; }
-        .text-primary { color: var(--color-primary); }
-        .text-danger { color: var(--color-danger); }
-        .text-success { color: var(--color-success); }
-        .text-sm { font-size: 0.875rem; }
-        .text-xs { font-size: 0.75rem; }
-
-        /* --- COMPONENTES UI --- */
         
-        /* Botões */
         .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            font-size: 1rem;
-            text-decoration: none;
-            gap: 0.5rem;
+            gap: 8px;
         }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
-
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: white;
-            box-shadow: var(--shadow-md);
-        }
-        .btn-primary:hover:not(:disabled) { background-color: var(--color-primary-dark); transform: translateY(-1px); }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 2px solid var(--color-primary);
-            color: var(--color-primary);
-        }
-        .btn-secondary:hover { background-color: rgba(46, 4, 109, 0.05); }
-
-        .btn-danger {
-            background-color: var(--color-danger);
-            color: white;
-        }
-
-        /* Inputs */
-        .form-group { margin-bottom: 1.25rem; text-align: left; }
-        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--color-text-secondary); }
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--color-border);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            transition: var(--transition-fast);
-            background: white;
-        }
-        .form-input:focus {
-            border-color: var(--color-primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(46, 4, 109, 0.1);
-        }
-        .form-error { color: var(--color-danger); font-size: 0.875rem; margin-top: 0.25rem; display: none; }
-
-        /* Cards */
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3); }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { border: 2px solid var(--primary); color: var(--primary); background: transparent; }
+        .btn-danger { background: var(--danger); color: white; }
+        
         .card {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
-        }
-
-        /* --- LAYOUT ESPECÍFICO --- */
-
-        /* Header */
-        .app-header {
-            background: var(--color-primary);
-            color: white;
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-md);
-        }
-        .logo-container { display: flex; align-items: center; gap: 0.75rem; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px; }
-        .logo-icon { width: 32px; height: 32px; fill: var(--color-accent); }
-
-        /* Views */
-        .view-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem;
-            flex: 1;
-            width: 100%;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Auth Screen */
-        .auth-wrapper {
-            max-width: 480px;
-            margin: 4rem auto;
-            text-align: center;
-        }
-        .auth-header { margin-bottom: 2rem; }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        .balance-card {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        .balance-card::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-        .balance-amount { font-size: 2.5rem; font-weight: 700; margin: 0.5rem 0; letter-spacing: -1px; }
-
-        /* Action Buttons Grid */
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        @media (max-width: 600px) { .actions-grid { grid-template-columns: repeat(2, 1fr); } }
-
-        .action-btn {
-            background: white;
-            border: 1px solid var(--color-border);
+            background: var(--bg-card);
             border-radius: var(--radius-md);
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            color: var(--color-text-primary);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
         }
-        .action-btn:hover { border-color: var(--color-primary); background: #f8f5ff; }
-        .action-icon { font-size: 1.5rem; }
 
-        /* Listas */
-        .transaction-list { list-style: none; }
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--color-border);
+        .input-group { margin-bottom: 15px; position: relative; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: var(--text-muted); font-size: 0.85rem; }
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: border-color 0.3s;
         }
-        .transaction-item:last-child { border-bottom: none; }
-        .t-icon { width: 40px; height: 40px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
-        .t-pos { color: var(--color-success); }
-        .t-neg { color: var(--color-text-primary); }
+        .input-field:focus { border-color: var(--primary); }
 
-        /* Loading Overlay */
-        #loading-overlay {
+        /* ========================================
+        LOGIN / REGISTER SCREEN
+        ========================================
+        */
+        #auth-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9);
-            z-index: 9999;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
+            background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-card) 100%);
+            z-index: 9999;
+            padding: 20px;
         }
-        .spinner {
-            width: 50px; height: 50px;
-            border: 4px solid rgba(46, 4, 109, 0.1);
-            border-left-color: var(--color-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .auth-box {
+            width: 100%; max-width: 400px;
+            text-align: center;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .auth-logo { font-size: 3rem; margin-bottom: 10px; color: var(--primary); animation: float 3s ease-in-out infinite; }
+        .auth-toggle { margin-top: 20px; font-size: 0.9rem; cursor: pointer; color: var(--primary); text-decoration: underline; }
 
-        /* Notification / Toast */
-        #notification-area {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9000;
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* ========================================
+        APP LAYOUT
+        ========================================
+        */
+        #app-container { display: flex; height: 100vh; overflow: hidden; }
+        
+        /* SIDEBAR */
+        #sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            z-index: 100;
         }
-        .toast {
-            background: #333;
+        .brand {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.2rem; font-weight: 700; color: var(--primary);
+            margin-bottom: 40px;
+        }
+        .nav-item {
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(108, 92, 231, 0.1); color: var(--primary); }
+        .nav-item i { width: 20px; text-align: center; }
+
+        .user-mini {
+            margin-top: auto;
+            padding: 15px;
+            background: var(--bg-body);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .user-mini img { width: 40px; height: 40px; border-radius: 50%; background: var(--border); }
+        .user-mini div { overflow: hidden; }
+        .user-mini h4 { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* MAIN CONTENT */
+        #main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: var(--bg-body);
+            position: relative;
+        }
+        .section-header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .page-title h2 { font-size: 1.8rem; }
+        .page-title p { color: var(--text-muted); }
+
+        /* DASHBOARD WIDGETS */
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 1rem 1.5rem;
+            padding: 30px;
             border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
-            animation: slideIn 0.3s ease;
-            max-width: 350px;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
-        .toast.success { border-left: 4px solid var(--color-success); background: #1a1a1a; }
-        .toast.error { border-left: 4px solid var(--color-danger); background: #1a1a1a; }
+        .balance-card::before {
+            content: ''; position: absolute; top: -50px; right: -50px;
+            width: 200px; height: 200px; background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .balance-amount { font-size: 2.5rem; font-weight: 700; margin: 10px 0; }
+        .balance-actions { display: flex; gap: 15px; margin-top: 20px; }
+        .action-btn {
+            background: rgba(255,255,255,0.2);
+            border: none; color: white; padding: 10px 20px;
+            border-radius: var(--radius-sm); backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            font-size: 0.8rem; cursor: pointer; transition: background 0.2s;
+        }
+        .action-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* STORE GRID */
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; flex-direction: column;
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+        .product-img {
+            height: 180px;
+            background: var(--bg-body);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: var(--text-muted);
+            position: relative;
+        }
+        .product-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: var(--accent); color: white;
+            padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700;
+        }
+        .product-info { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+        .product-cat { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .product-title { font-weight: 600; margin: 5px 0; font-size: 1.1rem; }
+        .product-price { font-size: 1.2rem; color: var(--primary); font-weight: 700; margin-top: auto; }
+        .add-cart-btn {
+            width: 100%; margin-top: 10px;
+            padding: 10px; background: var(--text-main); color: var(--bg-card);
+            border-radius: var(--radius-sm); font-weight: 600;
+        }
+        .add-cart-btn:hover { background: var(--primary); color: white; }
+
+        /* TRANSACTION LIST */
+        .transaction-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 0; border-bottom: 1px solid var(--border);
+        }
+        .t-icon {
+            width: 45px; height: 45px; border-radius: 12px;
+            background: rgba(108, 92, 231, 0.1); color: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-right: 15px;
+        }
+        .t-info h4 { font-size: 0.95rem; margin-bottom: 4px; }
+        .t-info span { font-size: 0.8rem; color: var(--text-muted); }
+        .t-amount { font-weight: 700; }
+        .t-amount.plus { color: var(--success); }
+        .t-amount.minus { color: var(--danger); }
+
+        /* TOAST NOTIFICATIONS */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: var(--bg-card);
+            border-left: 5px solid var(--primary);
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: var(--shadow-lg);
+            min-width: 300px;
+            animation: slideIn 0.3s ease;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* Admin & Table */
-        .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th, .data-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--color-border); }
-        .data-table th { background: #f9fafb; font-weight: 600; }
-        .tag { padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-        .tag-admin { background: #E3F2FD; color: #1565C0; }
-        .tag-owner { background: #F3E5F5; color: #7B1FA2; }
-
-        /* Cartão de Crédito */
-        .credit-card-visual {
-            background: linear-gradient(135deg, #111, #333);
-            color: #fff;
-            padding: 1.5rem;
-            border-radius: 12px;
-            position: relative;
-            height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            margin-bottom: 1rem;
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            #app-container { flex-direction: column; }
+            #sidebar {
+                width: 100%; height: auto; position: fixed; bottom: 0; left: 0;
+                flex-direction: row; justify-content: space-around;
+                padding: 10px; border-right: none; border-top: 1px solid var(--border);
+                background: var(--bg-card);
+            }
+            .brand, .user-mini { display: none; }
+            .nav-item { flex-direction: column; gap: 4px; font-size: 0.7rem; padding: 8px; margin: 0; }
+            .nav-item span { display: block; }
+            #main-content { padding: 15px; margin-bottom: 70px; }
+            .balance-card { padding: 20px; }
+            .balance-amount { font-size: 2rem; }
+            .hide-mobile { display: none; }
         }
-        .chip { width: 40px; height: 30px; background: #FFD700; border-radius: 4px; margin-bottom: 1rem; opacity: 0.8; }
-        .card-number { font-family: 'Courier New', monospace; font-size: 1.5rem; letter-spacing: 2px; }
-        .card-name { text-transform: uppercase; font-size: 0.9rem; }
         
-        /* Chatbot */
-        .chat-window { height: 400px; display: flex; flex-direction: column; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; background: #f9f9f9; }
-        .chat-input-area { padding: 1rem; background: white; border-top: 1px solid var(--color-border); display: flex; gap: 0.5rem; }
-        .msg { padding: 0.5rem 1rem; border-radius: 1rem; margin-bottom: 0.5rem; max-width: 80%; }
-        .msg-bot { background: #E0E0E0; align-self: flex-start; border-bottom-left-radius: 0; }
-        .msg-user { background: var(--color-primary); color: white; align-self: flex-end; margin-left: auto; border-bottom-right-radius: 0; }
+        /* CHAT BUBBLE */
+        .chat-bubble {
+            background: var(--bg-body); padding: 10px 15px; border-radius: 15px;
+            margin-bottom: 10px; max-width: 80%; font-size: 0.9rem;
+        }
+        .chat-bubble.bot { background: rgba(108, 92, 231, 0.1); color: var(--primary); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .chat-bubble.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            z-index: 5000; display: flex; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-card); width: 90%; max-width: 500px;
+            padding: 30px; border-radius: var(--radius-md);
+            animation: scaleUp 0.3s ease;
+        }
+        @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     </style>
 </head>
 <body>
 
-    <div id="loading-overlay" class="hidden">
-        <div class="spinner"></div>
-        <p class="mt-2 font-bold text-primary">Processando Transação Segura...</p>
+    <div id="auth-container">
+        <div class="auth-box card">
+            <div class="auth-logo"><i class="fas fa-crown"></i></div>
+            <h2 id="auth-title">Banco Imperial</h2>
+            <p class="text-muted mb-2">Acesso Exclusivo</p>
+            
+            <form id="auth-form">
+                <div class="input-group text-left">
+                    <label>Nome Completo (Apenas Cadastro)</label>
+                    <input type="text" id="auth-name" class="input-field hidden" placeholder="Seu nome real">
+                </div>
+                <div class="input-group text-left">
+                    <label>CPF (Apenas números)</label>
+                    <input type="text" id="auth-cpf" class="input-field" placeholder="000.000.000-00" maxlength="14">
+                </div>
+                <div class="input-group text-left">
+                    <label>Senha</label>
+                    <input type="password" id="auth-pass" class="input-field" placeholder="******">
+                </div>
+                <button type="submit" class="btn btn-primary w-full">ACESSAR CONTA</button>
+            </form>
+            
+            <div class="auth-toggle" onclick="toggleAuthMode()">Não tem conta? Crie agora.</div>
+        </div>
     </div>
 
-    <div id="notification-area"></div>
-
-    <header class="app-header hidden" id="main-header">
-        <div class="view-container flex justify-between items-center" style="padding: 0; margin: 0 auto;">
-            <div class="logo-container">
-                <svg class="logo-icon" viewBox="0 0 24 24">
-                    <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z" />
-                </svg>
-                BANCO IMPERIAL
+    <div id="app-container" class="hidden">
+        
+        <nav id="sidebar">
+            <div class="brand">
+                <i class="fas fa-crown"></i> BANCO IMPERIAL
             </div>
-            <nav class="flex items-center gap-2">
-                <button class="btn btn-secondary text-white" style="border-color:white; color: white;" onclick="app.toggleHighContrast()" aria-label="Alto Contraste">
-                    👁️
-                </button>
-                <div id="user-pill" class="text-sm font-bold bg-white text-primary px-3 py-1 rounded-full">
-                    </div>
-                <button class="btn btn-danger text-sm" onclick="auth.logout()" aria-label="Sair">Sair</button>
-            </nav>
-        </div>
-    </header>
-
-    <main id="app">
-
-        <section id="view-login" class="view-container auth-wrapper">
-            <div class="card">
-                <div class="auth-header">
-                    <svg class="logo-icon" style="width: 64px; height: 64px; fill: var(--color-primary);" viewBox="0 0 24 24">
-                        <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z" />
-                    </svg>
-                    <h1 class="text-primary mt-2">Banco Imperial</h1>
-                    <p class="text-secondary">Exclusividade e Segurança Enterprise</p>
-                </div>
-
-                <form id="login-form" onsubmit="auth.handleLogin(event)">
-                    <div class="form-group">
-                        <label for="login-cpf" class="form-label">CPF</label>
-                        <input type="text" id="login-cpf" class="form-input" placeholder="000.000.000-00" maxlength="14" required aria-required="true">
-                    </div>
-                    <div class="form-group">
-                        <label for="login-pass" class="form-label">Senha de Acesso</label>
-                        <input type="password" id="login-pass" class="form-input" placeholder="••••••••" required aria-required="true">
-                    </div>
-                    <button type="submit" class="btn btn-primary w-full">Acessar Conta</button>
-                </form>
-
-                <div class="mt-4">
-                    <p class="text-sm">Não é cliente Imperial?</p>
-                    <button class="btn btn-secondary w-full mt-1" onclick="router.navigate('register')">Solicitar Abertura de Conta</button>
-                </div>
-                <div class="mt-2 text-xs text-secondary">
-                    <p>Ambiente Seguro • Criptografia de Ponta a Ponta</p>
+            
+            <div class="nav-item active" onclick="navigate('home')">
+                <i class="fas fa-home"></i> <span>Início</span>
+            </div>
+            <div class="nav-item" onclick="navigate('pix')">
+                <i class="fas fa-qrcode"></i> <span>Área Pix</span>
+            </div>
+            <div class="nav-item" onclick="navigate('store')">
+                <i class="fas fa-shopping-bag"></i> <span>Mercado</span>
+            </div>
+            <div class="nav-item" onclick="navigate('invest')">
+                <i class="fas fa-chart-line"></i> <span>Investir</span>
+            </div>
+            <div class="nav-item" onclick="navigate('cards')">
+                <i class="fas fa-credit-card"></i> <span>Cartões</span>
+            </div>
+            <div class="nav-item" onclick="navigate('help')">
+                <i class="fas fa-headset"></i> <span>Ajuda IA</span>
+            </div>
+            <div class="nav-item hidden" id="admin-link" onclick="navigate('admin')">
+                <i class="fas fa-shield-alt"></i> <span>Admin</span>
+            </div>
+            
+            <div class="user-mini">
+                <img src="https://ui-avatars.com/api/?name=User&background=6c5ce7&color=fff" id="user-avatar" alt="User">
+                <div>
+                    <h4 id="user-name-display">Carregando...</h4>
+                    <small id="user-cpf-display" class="text-muted">...</small>
                 </div>
             </div>
-        </section>
-
-        <section id="view-register" class="view-container auth-wrapper hidden">
-            <div class="card">
-                <h2 class="text-primary mb-2">Novo Associado</h2>
-                <form id="register-form" onsubmit="auth.handleRegister(event)">
-                    <div class="form-group">
-                        <label for="reg-name" class="form-label">Nome Completo</label>
-                        <input type="text" id="reg-name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-cpf" class="form-label">CPF</label>
-                        <input type="text" id="reg-cpf" class="form-input" placeholder="000.000.000-00" maxlength="14" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-pass" class="form-label">Senha (Min 6 caracteres)</label>
-                        <input type="password" id="reg-pass" class="form-input" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-pass-confirm" class="form-label">Confirmar Senha</label>
-                        <input type="password" id="reg-pass-confirm" class="form-input" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-full">Finalizar Cadastro</button>
-                    <button type="button" class="btn btn-secondary w-full mt-2" onclick="router.navigate('login')">Voltar</button>
-                </form>
+            <div class="nav-item text-danger mt-2" onclick="auth.logout()">
+                <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
             </div>
-        </section>
+        </nav>
 
-        <section id="view-dashboard" class="view-container hidden">
-            <div class="card balance-card">
-                <div class="flex justify-between items-center">
-                    <span>Saldo Disponível</span>
-                    <button class="btn btn-sm" style="background:rgba(255,255,255,0.2); color:white;" onclick="dashboard.toggleBalance()">👁️</button>
+        <main id="main-content">
+            
+            <header class="section-header">
+                <div class="page-title">
+                    <h2 id="page-heading">Visão Geral</h2>
+                    <p id="current-date">Carregando data...</p>
                 </div>
-                <div class="balance-amount" id="dash-balance">R$ ••••••</div>
-                <div class="text-sm opacity-80" id="dash-account-info">Ag: 0001 | CC: 00000-0</div>
-            </div>
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-outline" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="btn btn-primary" onclick="cart.open()">
+                        <i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span>
+                    </button>
+                </div>
+            </header>
 
-            <h3 class="font-bold text-primary mb-2">Serviços</h3>
-            <div class="actions-grid">
-                <button class="action-btn" onclick="router.navigate('pix')">
-                    <span class="action-icon">💠</span>
-                    PIX
-                </button>
-                <button class="action-btn" onclick="router.navigate('cards')">
-                    <span class="action-icon">💳</span>
-                    Cartões
-                </button>
-                <button class="action-btn" onclick="router.navigate('invest')">
-                    <span class="action-icon">📈</span>
-                    Investir
-                </button>
-                <button class="action-btn" onclick="router.navigate('help')">
-                    <span class="action-icon">🤖</span>
-                    Ajuda IA
-                </button>
-                <button class="action-btn hidden" id="btn-admin-panel" onclick="router.navigate('admin')">
-                    <span class="action-icon">🔐</span>
-                    Admin
-                </button>
-            </div>
-
-            <div class="card mt-4">
-                <h3 class="font-bold text-primary mb-2">Extrato Recente</h3>
-                <ul class="transaction-list" id="dash-history">
-                    <li class="text-center py-4 text-secondary">Carregando movimentações...</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="view-pix" class="view-container hidden">
-            <button class="btn btn-secondary mb-2" onclick="router.navigate('dashboard')">← Voltar</button>
-            <div class="card">
-                <h2 class="text-primary font-bold mb-2">Área PIX</h2>
-                <div class="form-group">
-                    <label class="form-label">Saldo Disponível: <span id="pix-balance" class="font-bold">...</span></label>
+            <section id="home" class="page-section">
+                <div class="balance-card">
+                    <p>Saldo Disponível</p>
+                    <div class="balance-amount" id="main-balance">R$ 0,00</div>
+                    <div class="flex justify-between items-center">
+                        <span>Poupança: <strong id="savings-balance">R$ 0,00</strong></span>
+                        <span>Cofrinho: <strong id="piggy-balance">R$ 0,00</strong></span>
+                    </div>
+                    <div class="balance-actions">
+                        <button class="action-btn" onclick="navigate('pix')"><i class="fas fa-paper-plane"></i> Pix</button>
+                        <button class="action-btn" onclick="openModal('deposit-modal')"><i class="fas fa-piggy-bank"></i> Cofrinho</button>
+                        <button class="action-btn" onclick="navigate('store')"><i class="fas fa-shopping-bag"></i> Comprar</button>
+                        <button class="action-btn" onclick="navigate('pix')"><i class="fas fa-hand-holding-usd"></i> Cobrar</button>
+                    </div>
                 </div>
 
-                <form onsubmit="transaction.handlePix(event)">
-                    <div class="form-group">
-                        <label for="pix-cpf" class="form-label">CPF do Recebedor</label>
-                        <input type="text" id="pix-cpf" class="form-input" placeholder="000.000.000-00" maxlength="14" required>
+                <h3>Últimas Transações</h3>
+                <div class="card mt-2">
+                    <div id="transaction-list">
+                        <div class="text-center text-muted py-3">Carregando histórico...</div>
                     </div>
-                    <div class="form-group">
-                        <label for="pix-amount" class="form-label">Valor (R$)</label>
-                        <input type="number" id="pix-amount" class="form-input" step="0.01" min="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="pix-desc" class="form-label">Descrição (Opcional)</label>
-                        <input type="text" id="pix-desc" class="form-input" maxlength="50">
-                    </div>
-                    <button type="submit" class="btn btn-primary w-full">Confirmar Transferência</button>
-                </form>
-            </div>
-        </section>
-
-        <section id="view-admin" class="view-container hidden">
-            <button class="btn btn-secondary mb-2" onclick="router.navigate('dashboard')">← Voltar</button>
-            <div class="card border-primary">
-                <div class="flex justify-between">
-                    <h2 class="text-primary font-bold">PAINEL ENTERPRISE</h2>
-                    <span class="tag tag-admin" id="admin-badge">ADMIN</span>
                 </div>
-                
-                <div class="mt-4 p-4 bg-gray-100 rounded">
-                    <h3 class="font-bold mb-2">Emissão de Boletos (Owners Only)</h3>
-                    <div id="admin-boleto-area">
-                        <form onsubmit="admin.createBoleto(event)">
-                            <div class="form-group">
-                                <label class="form-label">Tipo de Emissão</label>
-                                <select id="boleto-type" class="form-input">
-                                    <option value="individual">Individual (CPF Específico)</option>
-                                    <option value="global">GLOBAL (Todos os usuários)</option>
-                                </select>
+            </section>
+
+            <section id="pix" class="page-section hidden">
+                <div class="grid-2-col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="card">
+                        <h3><i class="fas fa-paper-plane text-primary"></i> Enviar Pix</h3>
+                        <form id="pix-send-form" class="mt-2">
+                            <div class="input-group">
+                                <label>Chave Pix (CPF)</label>
+                                <input type="text" id="pix-dest-cpf" class="input-field" placeholder="000.000.000-00">
                             </div>
-                            <div class="form-group" id="boleto-cpf-group">
-                                <label class="form-label">CPF Alvo</label>
-                                <input type="text" id="boleto-cpf" class="form-input">
+                            <div class="input-group">
+                                <label>Valor (R$)</label>
+                                <input type="number" id="pix-amount" class="input-field" placeholder="0.00" step="0.01">
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Valor (R$)</label>
-                                <input type="number" id="boleto-amount" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Descrição</label>
-                                <input type="text" id="boleto-desc" class="form-input" value="Taxa de Manutenção" required>
-                            </div>
-                            <button type="submit" class="btn btn-danger w-full">⚡ EMITIR COBRANÇA</button>
+                            <button type="submit" class="btn btn-primary w-full">Transferir Agora</button>
                         </form>
                     </div>
-                </div>
-
-                <div class="mt-4">
-                    <h3 class="font-bold mb-2">Auditoria do Sistema</h3>
-                    <div style="max-height: 300px; overflow-y: auto; border:1px solid #ddd;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Evento</th>
-                                    <th>Detalhes</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-logs-body">
-                                </tbody>
-                        </table>
+                    <div class="card">
+                        <h3><i class="fas fa-qrcode text-primary"></i> Receber Pix</h3>
+                        <div class="text-center mt-2">
+                            <p class="text-muted">Sua chave Pix é seu CPF</p>
+                            <div class="bg-light p-3 rounded mt-2 border" style="font-size: 1.2rem; font-family: monospace;">
+                                <span id="my-pix-key">...</span>
+                                <button class="btn-sm btn-outline ml-2" onclick="copyPixKey()"><i class="fas fa-copy"></i></button>
+                            </div>
+                            <div class="mt-4">
+                                <i class="fas fa-qrcode" style="font-size: 8rem; color: var(--text-main);"></i>
+                            </div>
+                        </div>
                     </div>
-                    <button class="btn btn-secondary mt-2 w-full" onclick="admin.refreshLogs()">Atualizar Logs</button>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="view-cards" class="view-container hidden">
-            <button class="btn btn-secondary mb-2" onclick="router.navigate('dashboard')">← Voltar</button>
-            <h2 class="text-primary font-bold mb-4">Meus Cartões</h2>
+            <section id="store" class="page-section hidden">
+                <div class="flex gap-2 mb-2 overflow-auto" id="store-cats">
+                    <button class="btn btn-primary btn-sm" onclick="store.filter('all')">Tudo</button>
+                    <button class="btn btn-outline btn-sm" onclick="store.filter('Tecnologia')">Tecnologia</button>
+                    <button class="btn btn-outline btn-sm" onclick="store.filter('Roupas')">Roupas</button>
+                    <button class="btn btn-outline btn-sm" onclick="store.filter('VIP')">VIP/RP</button>
+                </div>
+                
+                <div id="store-container" class="store-grid">
+                    </div>
+            </section>
+
+            <section id="invest" class="page-section hidden">
+                <div class="card text-center">
+                    <i class="fas fa-chart-line text-danger" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                    <h2>High Risk Trading</h2>
+                    <p class="text-muted mb-2">Risco extremo: 85% de chance de PERDA / 15% de chance de LUCRO (2x).</p>
+                    
+                    <div class="input-group" style="max-width: 300px; margin: 20px auto;">
+                        <label>Valor do Investimento</label>
+                        <input type="number" id="invest-amount" class="input-field" placeholder="Min: R$ 50,00">
+                    </div>
+                    <button class="btn btn-danger" onclick="bank.invest()">APOSTAR NO MERCADO</button>
+                </div>
+                <div class="card mt-2">
+                    <h3>Histórico de Investimentos</h3>
+                    <div id="invest-history"></div>
+                </div>
+            </section>
             
-            <div class="credit-card-visual">
-                <div class="flex justify-between">
-                    <span class="font-bold">IMPERIAL BLACK</span>
-                    <span>👑</span>
-                </div>
-                <div class="chip"></div>
-                <div class="card-number" id="card-display-num">•••• •••• •••• ••••</div>
-                <div class="flex justify-between items-end">
-                    <div class="card-name" id="card-display-name">NOME DO USUÁRIO</div>
-                    <div class="text-sm">VAL 12/29</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="font-bold">Cartão Virtual</span>
-                    <button class="btn btn-sm btn-primary" onclick="cards.generateVirtual()">Gerar Novo CVV</button>
-                </div>
-                <hr class="mb-2">
-                <p>Status: <span class="text-success font-bold">ATIVO</span></p>
-                <p>Limite Disponível: <span class="font-bold">R$ 12.500,00</span></p>
-                <div class="mt-4">
-                    <h4 class="font-bold mb-1">Últimas Compras</h4>
-                    <p class="text-secondary text-sm">Nenhuma compra recente no cartão.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-invest" class="view-container hidden">
-            <button class="btn btn-secondary mb-2" onclick="router.navigate('dashboard')">← Voltar</button>
-            <div class="card border-primary" style="border-width: 2px;">
-                <h2 class="text-primary font-bold mb-2">Investimento de Alto Risco</h2>
-                <div class="p-4 bg-yellow-50 text-yellow-800 rounded mb-4 text-sm border border-yellow-200">
-                    <strong>⚠️ AVISO LEGAL:</strong> Este produto financeiro possui volatilidade extrema.
-                    Historicamente, 85% das operações resultam em perda total do capital investido.
-                </div>
-
-                <div class="text-center mb-4">
-                    <div class="text-4xl mb-2">🎰</div>
-                    <p>Multiplicador Potencial: <strong>5.0x</strong></p>
-                    <p>Probabilidade de Ganho: <strong>15%</strong></p>
-                </div>
-
-                <form onsubmit="invest.play(event)">
-                    <div class="form-group">
-                        <label class="form-label">Valor do Aporte (R$)</label>
-                        <input type="number" id="invest-amount" class="form-input" min="10" required>
+            <section id="help" class="page-section hidden">
+                <div class="card" style="height: 60vh; display: flex; flex-direction: column;">
+                    <div id="chat-window" style="flex: 1; overflow-y: auto; padding: 10px; border-bottom: 1px solid var(--border);">
+                        <div class="chat-bubble bot">Olá! Sou a IA do Banco Imperial. Como posso ajudar com Pix, Loja ou Segurança?</div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-full" style="background: #FF6D00;">Realizar Aporte</button>
-                </form>
-                <div id="invest-result" class="mt-4 text-center font-bold"></div>
-            </div>
-        </section>
-
-        <section id="view-help" class="view-container hidden">
-            <button class="btn btn-secondary mb-2" onclick="router.navigate('dashboard')">← Voltar</button>
-            <div class="card p-0 overflow-hidden">
-                <div class="p-4 bg-primary text-white flex items-center gap-2">
-                    <span>🤖</span>
-                    <strong>Imperial AI</strong>
-                </div>
-                <div class="chat-window">
-                    <div class="chat-messages" id="chat-feed">
-                        <div class="msg msg-bot">Olá! Sou a IA do Banco Imperial. Como posso ajudar você hoje?</div>
+                    <div class="flex gap-1 mt-2">
+                        <input type="text" id="chat-input" class="input-field" placeholder="Digite sua dúvida...">
+                        <button class="btn btn-primary" onclick="helpAI.send()"><i class="fas fa-paper-plane"></i></button>
                     </div>
-                    <form class="chat-input-area" onsubmit="chatbot.send(event)">
-                        <input type="text" id="chat-input" class="form-input" placeholder="Digite sua dúvida..." autocomplete="off">
-                        <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </section>
+
+            <section id="admin" class="page-section hidden">
+                <h2>Painel Administrativo</h2>
+                <div class="grid-2-col flex gap-2 mb-2">
+                     <button class="btn btn-primary" onclick="admin.renderProductForm()">Novo Produto</button>
+                     <button class="btn btn-outline" onclick="admin.viewLogs()">Logs Globais</button>
+                </div>
+                
+                <div class="card" id="admin-panel-content">
+                    <h3>Gerenciar Produtos da Loja</h3>
+                    <form id="add-product-form" class="mt-2">
+                        <div class="input-group"><label>Nome</label><input type="text" id="prod-name" class="input-field"></div>
+                        <div class="input-group"><label>Preço</label><input type="number" id="prod-price" class="input-field"></div>
+                        <div class="input-group"><label>Categoria</label><input type="text" id="prod-cat" class="input-field"></div>
+                        <div class="input-group"><label>Imagem (URL)</label><input type="text" id="prod-img" class="input-field"></div>
+                        <button type="button" class="btn btn-success" onclick="admin.addProduct()">Salvar Produto</button>
                     </form>
                 </div>
-            </div>
-        </section>
+            </section>
+            
+            <section id="cards" class="page-section hidden">
+                <div class="card" style="background: linear-gradient(45deg, #2d3436, #000); color: #fff; height: 200px; max-width: 350px; border-radius: 15px; padding: 20px; position: relative;">
+                    <div class="flex justify-between items-center">
+                        <span>IMPERIAL BLACK</span>
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <div style="margin-top: 40px; font-size: 1.4rem; letter-spacing: 2px; font-family: monospace;">
+                        **** **** **** <span id="card-last4">8829</span>
+                    </div>
+                    <div class="flex justify-between items-center" style="position: absolute; bottom: 20px; left: 20px; right: 20px;">
+                        <div>
+                            <span style="font-size: 0.6rem; display: block; opacity: 0.7;">TITULAR</span>
+                            <span style="font-size: 0.9rem;" id="card-holder">NOME USUARIO</span>
+                        </div>
+                        <i class="fab fa-cc-mastercard" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                     <button class="btn btn-outline" onclick="toast('Cartão bloqueado temporariamente', 'success')">Bloquear</button>
+                     <button class="btn btn-outline" onclick="toast('Novo cartão virtual gerado', 'success')">Gerar Virtual</button>
+                </div>
+            </section>
 
-    </main>
+        </main>
+    </div>
+
+    <div id="deposit-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeModal('deposit-modal')">
+        <div class="modal-content">
+            <h3><i class="fas fa-piggy-bank"></i> Meu Cofrinho</h3>
+            <p class="text-muted">Guarde dinheiro longe do saldo principal.</p>
+            <br>
+            <div class="flex gap-2 mb-2">
+                <button class="btn btn-outline w-full" onclick="bank.togglePiggyMode('deposit')">Guardar</button>
+                <button class="btn btn-outline w-full" onclick="bank.togglePiggyMode('withdraw')">Resgatar</button>
+            </div>
+            <div class="input-group">
+                <label>Valor</label>
+                <input type="number" id="piggy-amount" class="input-field">
+            </div>
+            <button class="btn btn-primary w-full" onclick="bank.handlePiggy()">Confirmar</button>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="modal-overlay hidden" onclick="if(event.target === this) cart.close()">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-2">
+                <h3>Seu Carrinho</h3>
+                <button class="btn-sm btn-danger" onclick="cart.clear()"><i class="fas fa-trash"></i></button>
+            </div>
+            <div id="cart-items" style="max-height: 300px; overflow-y: auto;">
+                </div>
+            <hr class="mt-2 mb-2">
+            <div class="flex justify-between items-center">
+                <strong>Total:</strong>
+                <strong id="cart-total" class="text-primary" style="font-size: 1.3rem;">R$ 0,00</strong>
+            </div>
+            <button class="btn btn-primary w-full mt-2" onclick="store.checkout()">FINALIZAR COMPRA (SALDO)</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
 
     <script>
-        /**
-         * BANCO IMPERIAL - CORE SYSTEM
-         * Author: Senior Architect
-         * Version: 1.0.0 Enterprise
-         */
-
-        // --- CONFIGURATIONS ---
-        const CONFIG = {
-            FIREBASE_URL: "https://banco-imperial-default-rtdb.firebaseio.com",
-            API_KEY: "AIzaSyDWat0SS6tRICcLAOmNy843MUoicfTfD8I", // Note: API Key is mostly for SDK, REST uses URL
-            ROLES: {
-                USER: 'USER',
-                ADMIN: 'ADMIN', // Dono do Banco
-                MASTER: 'MASTER' // Dono do RP
-            },
-            PASSWORDS: {
-                MASTER: '172244',
-                ADMIN: 'ryan_imperial'
-            }
+        /* ========================================
+        FIREBASE CONFIGURATION
+        ========================================
+        */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWat0SS6tRICcLAOmNy843MUoicfTfD8I",
+            authDomain: "banco-imperial-default-rtdb.firebaseapp.com",
+            databaseURL: "https://banco-imperial-default-rtdb.firebaseio.com",
+            projectId: "banco-imperial-default-rtdb",
+            storageBucket: "banco-imperial-default-rtdb.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
         };
 
-        // --- STATE MANAGEMENT ---
-        const state = {
-            currentUser: null,
-            token: null,
-            usersCache: {}, // Cache simples para evitar leituras excessivas
-            transactions: []
-        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        // --- UTILS MODULE ---
-        const utils = {
-            // Formata moeda
-            formatCurrency: (value) => {
-                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-            },
-            
-            // Mascara CPF simples (apenas visual)
-            maskCPF: (cpf) => {
-                return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-            },
+        /* ========================================
+        GLOBAL STATE
+        ========================================
+        */
+        let currentUser = null;
+        let cartItems = [];
+        let isRegistering = false;
 
-            // Limpa CPF para numeros
-            cleanCPF: (cpf) => {
-                return cpf.replace(/\D/g, '');
-            },
+        /* ========================================
+        UTILS
+        ========================================
+        */
+        const $ = (id) => document.getElementById(id);
+        const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+        const generateId = () => Math.random().toString(36).substr(2, 9);
+        const getTimestamp = () => new Date().toISOString();
 
-            // Gera data atual formatada
-            getDateTime: () => {
-                return new Date().toLocaleString('pt-BR');
-            },
-
-            // Toast Notifications
-            notify: (message, type = 'info') => {
-                const area = document.getElementById('notification-area');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.innerHTML = `
-                    <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-                    <span>${message}</span>
-                `;
-                area.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
-            },
-
-            // Loading Spinner
-            toggleLoading: (show) => {
-                const el = document.getElementById('loading-overlay');
-                if(show) el.classList.remove('hidden');
-                else el.classList.add('hidden');
-            },
-
-            // Gera ID único
-            generateId: () => {
-                return 'tx_' + Math.random().toString(36).substr(2, 9);
-            }
-        };
-
-        // --- API LAYER (FIREBASE REST) ---
-        // Implementação manual de fetch para evitar bibliotecas externas
-        const api = {
-            async get(path) {
-                try {
-                    const response = await fetch(`${CONFIG.FIREBASE_URL}/${path}.json`);
-                    if (!response.ok) throw new Error('Falha na conexão');
-                    return await response.json();
-                } catch (error) {
-                    console.error("API GET Error:", error);
-                    utils.notify("Erro de conexão com o banco.", "error");
-                    return null;
-                }
-            },
-
-            async put(path, data) {
-                try {
-                    const response = await fetch(`${CONFIG.FIREBASE_URL}/${path}.json`, {
-                        method: 'PUT',
-                        body: JSON.stringify(data),
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    return await response.json();
-                } catch (error) {
-                    utils.notify("Erro ao salvar dados.", "error");
-                    throw error;
-                }
-            },
-
-            async patch(path, data) {
-                 try {
-                    const response = await fetch(`${CONFIG.FIREBASE_URL}/${path}.json`, {
-                        method: 'PATCH', // Update partial
-                        body: JSON.stringify(data),
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    return await response.json();
-                } catch (error) {
-                    throw error;
-                }
-            },
-
-            async post(path, data) {
-                try {
-                    const response = await fetch(`${CONFIG.FIREBASE_URL}/${path}.json`, {
-                        method: 'POST', // Push list
-                        body: JSON.stringify(data),
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    return await response.json();
-                } catch (error) {
-                    throw error;
-                }
-            }
-        };
-
-        // --- AUTH CONTROLLER ---
-        const auth = {
-            async handleLogin(e) {
-                e.preventDefault();
-                utils.toggleLoading(true);
-
-                const cpf = utils.cleanCPF(document.getElementById('login-cpf').value);
-                const pass = document.getElementById('login-pass').value;
-
-                if (cpf.length !== 11) {
-                    utils.toggleLoading(false);
-                    return utils.notify("CPF inválido.", "error");
-                }
-
-                try {
-                    // Busca usuário
-                    const user = await api.get(`users/${cpf}`);
-
-                    if (!user) {
-                        utils.toggleLoading(false);
-                        return utils.notify("Usuário não encontrado.", "error");
-                    }
-
-                    // Verifica senha (Simples comparação direta para este protótipo, em prod usaríamos hash)
-                    // Verifica também senhas mestras
-                    let role = CONFIG.ROLES.USER;
-                    let validPass = (user.password === pass);
-
-                    // Override para donos
-                    if (pass === CONFIG.PASSWORDS.MASTER) {
-                        validPass = true;
-                        role = CONFIG.ROLES.MASTER;
-                        utils.notify("👑 Acesso MASTER concedido", "success");
-                    } else if (pass === CONFIG.PASSWORDS.ADMIN) {
-                        validPass = true;
-                        role = CONFIG.ROLES.ADMIN;
-                        utils.notify("🟣 Acesso ADMIN concedido", "success");
-                    }
-
-                    if (validPass) {
-                        state.currentUser = { ...user, cpf, role: role }; // Atualiza role na sessão
-                        
-                        // Atualiza role no banco se for login especial para garantir persistência futura
-                        if(role !== user.role && (role === CONFIG.ROLES.MASTER || role === CONFIG.ROLES.ADMIN)) {
-                             await api.patch(`users/${cpf}`, { role: role });
-                        }
-
-                        this.initSession();
-                    } else {
-                        // Log tentativa falha
-                        await api.post('logs', {
-                            type: 'LOGIN_FAIL',
-                            cpf: cpf,
-                            date: utils.getDateTime()
-                        });
-                        utils.notify("Senha incorreta.", "error");
-                    }
-
-                } catch (err) {
-                    console.error(err);
-                    utils.notify("Erro no sistema de login.", "error");
-                } finally {
-                    utils.toggleLoading(false);
-                }
-            },
-
-            async handleRegister(e) {
-                e.preventDefault();
-                utils.toggleLoading(true);
-
-                const name = document.getElementById('reg-name').value;
-                const cpf = utils.cleanCPF(document.getElementById('reg-cpf').value);
-                const pass = document.getElementById('reg-pass').value;
-                const passConfirm = document.getElementById('reg-pass-confirm').value;
-
-                if (pass !== passConfirm) {
-                    utils.toggleLoading(false);
-                    return utils.notify("Senhas não conferem.", "error");
-                }
-
-                if (cpf.length !== 11) {
-                    utils.toggleLoading(false);
-                    return utils.notify("CPF inválido.", "error");
-                }
-
-                try {
-                    // Check existência
-                    const exists = await api.get(`users/${cpf}`);
-                    if (exists) {
-                        utils.toggleLoading(false);
-                        return utils.notify("CPF já cadastrado.", "error");
-                    }
-
-                    const newUser = {
-                        name: name,
-                        password: pass, // Nota: Em prod real, hash aqui.
-                        balance: 1000.00, // Bônus inicial
-                        role: CONFIG.ROLES.USER,
-                        createdAt: utils.getDateTime(),
-                        account: '0001-' + Math.floor(Math.random() * 10000)
-                    };
-
-                    await api.put(`users/${cpf}`, newUser);
-                    
-                    // Log
-                    await api.post('logs', { type: 'REGISTER', cpf: cpf, date: utils.getDateTime() });
-
-                    utils.notify("Conta criada com sucesso! Faça login.", "success");
-                    router.navigate('login');
-
-                } catch (err) {
-                    utils.notify("Erro ao criar conta.", "error");
-                } finally {
-                    utils.toggleLoading(false);
-                }
-            },
-
-            initSession() {
-                document.getElementById('user-pill').innerText = state.currentUser.name.split(' ')[0];
-                document.getElementById('main-header').classList.remove('hidden');
-                
-                // Show Admin Button if permission
-                const adminBtn = document.getElementById('btn-admin-panel');
-                const adminBadge = document.getElementById('admin-badge');
-                
-                if (state.currentUser.role === CONFIG.ROLES.ADMIN || state.currentUser.role === CONFIG.ROLES.MASTER) {
-                    adminBtn.classList.remove('hidden');
-                    if(adminBadge) adminBadge.innerText = state.currentUser.role;
-                } else {
-                    adminBtn.classList.add('hidden');
-                }
-
-                router.navigate('dashboard');
-                dashboard.refresh();
-            },
-
-            logout() {
-                state.currentUser = null;
-                document.getElementById('main-header').classList.add('hidden');
-                document.getElementById('login-form').reset();
-                router.navigate('login');
-                utils.notify("Sessão finalizada.", "info");
-            }
-        };
-
-        // --- ROUTER & VIEW CONTROLLER ---
-        const router = {
-            navigate(viewId) {
-                // Hide all views
-                document.querySelectorAll('.view-container').forEach(el => el.classList.add('hidden'));
-                
-                // Show target
-                const target = document.getElementById(`view-${viewId}`);
-                if (target) {
-                    target.classList.remove('hidden');
-                    window.scrollTo(0, 0);
-                }
-                
-                // Specific init logic
-                if (viewId === 'dashboard') dashboard.refresh();
-                if (viewId === 'admin') admin.init();
-                if (viewId === 'cards') cards.init();
-            }
-        };
-
-        // --- DASHBOARD CONTROLLER ---
-        const dashboard = {
-            async refresh() {
-                if (!state.currentUser) return;
-                
-                // Reload user data to ensure balance is up to date
-                const freshUser = await api.get(`users/${state.currentUser.cpf}`);
-                state.currentUser = { ...state.currentUser, ...freshUser };
-
-                document.getElementById('dash-balance').setAttribute('data-value', state.currentUser.balance);
-                document.getElementById('dash-account-info').innerText = `Ag: 0001 | CC: ${state.currentUser.account}`;
-                this.renderBalance();
-                this.loadHistory();
-            },
-
-            toggleBalance() {
-                const el = document.getElementById('dash-balance');
-                if (el.innerText.includes('•')) {
-                    el.innerText = utils.formatCurrency(el.getAttribute('data-value'));
-                } else {
-                    el.innerText = 'R$ ••••••';
-                }
-            },
-
-            renderBalance() {
-                // Default to masked
-                document.getElementById('dash-balance').innerText = 'R$ ••••••';
-            },
-
-            // Dentro de const dashboard = { ...
-
-async loadHistory() {
-    const list = document.getElementById('dash-history');
-    list.innerHTML = '<li class="text-center py-4 text-secondary">Carregando...</li>';
-    
-    const allLogs = await api.get('logs');
-    if(!allLogs) {
-            list.innerHTML = '<li class="text-center py-4 text-secondary">Sem movimentações.</li>';
-            return;
-    }
-
-    const myLogs = Object.values(allLogs)
-        .filter(log => log.cpf === state.currentUser.cpf || log.targetCpf === state.currentUser.cpf)
-        // CORREÇÃO: Ordena pela data ISO (string YYYY-MM-DD funciona perfeitamente para sort)
-        .sort((a, b) => (b.date || '').localeCompare(a.date || '')) 
-        .slice(0, 5);
-
-    list.innerHTML = '';
-    if(myLogs.length === 0) {
-            list.innerHTML = '<li class="text-center py-4 text-secondary">Sem movimentações recentes.</li>';
-            return;
-    }
-
-    myLogs.forEach(log => {
-        let icon = '📄';
-        let valClass = '';
-        let signal = '';
-        let desc = log.type;
-
-        // Usa displayDate se existir (legado) ou formata a data ISO na hora
-        const dateShow = log.displayDate || new Date(log.date).toLocaleString('pt-BR');
-
-        if (log.type === 'PIX_SENT') { icon = '💸'; valClass = 't-neg'; signal = '-'; desc = `Envio para ${log.targetName || '...'}`; }
-        if (log.type === 'PIX_RECEIVED') { icon = '💰'; valClass = 't-pos'; signal = '+'; desc = `Recebido de ${log.originName || '...'}`; }
-        if (log.type === 'BOLETO_PAID') { icon = '🧾'; valClass = 't-neg'; signal = '-'; desc = 'Pagamento Boleto'; }
-        if (log.type === 'INVEST_WIN') { icon = '📈'; valClass = 't-pos'; signal = '+'; desc = 'Rendimento'; }
-        if (log.type === 'INVEST_LOSS') { icon = '📉'; valClass = 't-neg'; signal = '-'; desc = 'Perda Investimento'; }
-
-        if (!log.amount) return;
-
-        const li = document.createElement('li');
-        li.className = 'transaction-item';
-        li.innerHTML = `
-            <div class="flex items-center">
-                <div class="t-icon">${icon}</div>
-                <div>
-                    <div class="font-bold">${desc}</div>
-                    <div class="text-xs text-secondary">${dateShow}</div>
-                </div>
-            </div>
-            <div class="font-bold ${valClass}">
-                ${signal} ${utils.formatCurrency(log.amount)}
-            </div>
-        `;
-        list.appendChild(li);
-    });
-}
-
-        // --- TRANSACTION CONTROLLER (PIX) ---
-        const transaction = {
-            // Localize: const transaction = { ...
-// Substitua o método handlePix(e) inteiro por este:
-
-async handlePix(e) {
-    e.preventDefault();
-    utils.toggleLoading(true);
-
-    // Limpa CPF e garante que Amount é número flutuante
-    const targetCpf = utils.cleanCPF(document.getElementById('pix-cpf').value);
-    const amount = parseFloat(document.getElementById('pix-amount').value);
-    const desc = document.getElementById('pix-desc').value;
-
-    // Validações básicas
-    if (targetCpf === state.currentUser.cpf) {
-        utils.toggleLoading(false);
-        return utils.notify("Não pode transferir para si mesmo.", "error");
-    }
-    
-    // Validação de segurança de saldo
-    if (isNaN(amount) || amount <= 0) {
-        utils.toggleLoading(false);
-        return utils.notify("Valor inválido.", "error");
-    }
-
-    if (amount > state.currentUser.balance) {
-        utils.toggleLoading(false);
-        return utils.notify("Saldo insuficiente.", "error");
-    }
-
-    try {
-        // 1. Busca destinatário
-        const targetUser = await api.get(`users/${targetCpf}`);
-        if (!targetUser) {
-            utils.toggleLoading(false);
-            return utils.notify("Destinatário não encontrado.", "error");
+        function toast(msg, type = 'success') {
+            const container = $('toast-container');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.innerHTML = `<span>${msg}</span> <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>`;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 4000);
         }
 
-        // --- CORREÇÃO AQUI ---
-        // Força conversão para Number para evitar concatenação de string ("100" + 50 = "10050")
-        const currentSenderBalance = Number(state.currentUser.balance);
-        const currentTargetBalance = Number(targetUser.balance || 0);
+        function closeModal(id) { $(id).classList.add('hidden'); }
+        function openModal(id) { $(id).classList.remove('hidden'); }
 
-        // Cálculos seguros
-        const newBalanceUser = currentSenderBalance - amount;
-        const newBalanceTarget = currentTargetBalance + amount;
-
-        // 2. Execução (Ordem segura: Tira de um, põe no outro)
-        // Nota: Em produção real, isso seria uma transaction atômica no backend.
+        /* ========================================
+        THEME & UI
+        ========================================
+        */
+        function initTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            if(theme === 'dark') document.body.classList.add('dark-mode');
+            
+            // Set Date
+            const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            $('current-date').innerText = new Date().toLocaleDateString('pt-BR', opts);
+        }
         
-        // Debita do remetente
-        await api.patch(`users/${state.currentUser.cpf}`, { balance: newBalanceUser });
-        
-        // Credita no destinatário
-        await api.patch(`users/${targetCpf}`, { balance: newBalanceTarget });
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+            // Save preference to Firebase if logged in
+            if(currentUser) db.ref(`users/${currentUser.cpf}/theme`).set(theme);
+        }
 
-        // 3. Logs com DATA ISO (Para corrigir a ordenação no extrato)
-        const isoDate = new Date().toISOString(); // Formato ordenável: 2023-12-31T23:59...
-        const displayDate = utils.getDateTime(); // Formato visual: 31/12/2023...
+        function navigate(sectionId) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
+            $(sectionId).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Highlight nav
+            const navMap = { 'home':0, 'pix':1, 'store':2, 'invest':3, 'cards':4, 'help':5 };
+            if(navMap[sectionId] !== undefined) document.querySelectorAll('.nav-item')[navMap[sectionId]].classList.add('active');
+            
+            $('page-heading').innerText = sectionId === 'home' ? 'Visão Geral' : 
+                                          sectionId === 'pix' ? 'Área Pix' : 
+                                          sectionId === 'store' ? 'Mercado Imperial' :
+                                          sectionId === 'invest' ? 'Investimentos' :
+                                          sectionId === 'admin' ? 'Administração' : 'Ajuda';
+        }
 
-        // Log Remetente
-        await api.post('logs', {
-            type: 'PIX_SENT',
-            cpf: state.currentUser.cpf,
-            targetCpf: targetCpf,
-            targetName: targetUser.name,
-            amount: amount,
-            desc: desc,
-            date: isoDate,        // Data para ordenação
-            displayDate: displayDate // Data para exibir
-        });
+        /* ========================================
+        AUTHENTICATION LOGIC
+        ========================================
+        */
+        function toggleAuthMode() {
+            isRegistering = !isRegistering;
+            $('auth-title').innerText = isRegistering ? 'Criar Conta' : 'Banco Imperial';
+            $('auth-name').classList.toggle('hidden');
+            document.querySelector('.auth-toggle').innerText = isRegistering ? 'Já tem conta? Faça login.' : 'Não tem conta? Crie agora.';
+        }
 
-        // Log Destinatário
-        await api.post('logs', {
-            type: 'PIX_RECEIVED',
-            cpf: targetCpf,
-            originCpf: state.currentUser.cpf,
-            originName: state.currentUser.name,
-            amount: amount,
-            date: isoDate,
-            displayDate: displayDate
-        });
+        const auth = {
+            init: () => {
+                $('auth-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const cpf = $('auth-cpf').value.replace(/\D/g, '');
+                    const pass = $('auth-pass').value;
+                    const name = $('auth-name').value;
 
-        // Atualiza estado local imediatamente para refletir saldo sem refresh
-        state.currentUser.balance = newBalanceUser;
-        
-        utils.notify("Transferência realizada com sucesso!", "success");
-        router.navigate('dashboard');
+                    if(cpf.length !== 11) return toast('CPF inválido', 'error');
+                    if(!pass) return toast('Digite a senha', 'error');
 
-    } catch (err) {
-        console.error(err);
-        utils.notify("Erro crítico ao processar. Contate o suporte.", "error");
-    } finally {
-        utils.toggleLoading(false);
-    }
-}
+                    if(isRegistering) {
+                        if(!name) return toast('Nome obrigatório', 'error');
+                        auth.register(name, cpf, pass);
+                    } else {
+                        auth.login(cpf, pass);
+                    }
+                });
+            },
 
-                    // Lógica de Transferência "Atômica" (Mockada sequencial)
-                    // 1. Debita
-                    const newBalanceUser = state.currentUser.balance - amount;
-                    await api.patch(`users/${state.currentUser.cpf}`, { balance: newBalanceUser });
-                    
-                    // 2. Credita
-                    const newBalanceTarget = (targetUser.balance || 0) + amount;
-                    await api.patch(`users/${targetCpf}`, { balance: newBalanceTarget });
-
-                    // 3. Logs
-                    const date = utils.getDateTime();
-                    // Log para quem enviou
-                    await api.post('logs', {
-                        type: 'PIX_SENT',
-                        cpf: state.currentUser.cpf,
-                        targetCpf: targetCpf,
-                        targetName: targetUser.name,
-                        amount: amount,
-                        desc: desc,
-                        date: date
-                    });
-                    // Log para quem recebeu
-                    await api.post('logs', {
-                        type: 'PIX_RECEIVED',
-                        cpf: targetCpf, // O log pertence ao cpf chave
-                        originCpf: state.currentUser.cpf,
-                        originName: state.currentUser.name,
-                        amount: amount,
-                        date: date
-                    });
-
-                    utils.notify("Transferência realizada com sucesso!", "success");
-                    router.navigate('dashboard');
-
-                } catch (err) {
-                    console.error(err);
-                    utils.notify("Erro ao processar transação.", "error");
-                } finally {
-                    utils.toggleLoading(false);
+            login: async (cpf, pass) => {
+                const snap = await db.ref(`users/${cpf}`).get();
+                if(snap.exists()) {
+                    const data = snap.val();
+                    if(data.password === pass) {
+                        auth.setSession(data);
+                    } else {
+                        toast('Senha incorreta', 'error');
+                    }
+                } else {
+                    toast('Usuário não encontrado', 'error');
                 }
+            },
+
+            register: async (name, cpf, pass) => {
+                const snap = await db.ref(`users/${cpf}`).get();
+                if(snap.exists()) return toast('CPF já cadastrado', 'error');
+
+                const newUser = {
+                    name: name,
+                    cpf: cpf,
+                    password: pass,
+                    balance: 0,
+                    savings: 0,
+                    piggyBank: 0,
+                    role: (pass === '172244' || pass === 'ryan_imperial') ? 'admin' : 'user', // Backdoor for demo
+                    createdAt: getTimestamp()
+                };
+
+                await db.ref(`users/${cpf}`).set(newUser);
+                toast('Conta criada com sucesso!', 'success');
+                auth.setSession(newUser);
+            },
+
+            setSession: (user) => {
+                currentUser = user;
+                $('auth-container').classList.add('hidden');
+                $('app-container').classList.remove('hidden');
+                
+                // UI Updates
+                $('user-name-display').innerText = user.name;
+                $('card-holder').innerText = user.name.toUpperCase();
+                $('user-cpf-display').innerText = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+                $('my-pix-key').innerText = user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+                $('user-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6c5ce7&color=fff`;
+
+                // Listeners
+                bank.listenToBalance();
+                bank.loadHistory();
+                store.loadProducts();
+
+                // Admin Check
+                if(user.role === 'admin' || user.password === 'ryan_imperial') {
+                    $('admin-link').classList.remove('hidden');
+                }
+
+                toast(`Bem-vindo, ${user.name.split(' ')[0]}`, 'success');
+            },
+
+            logout: () => {
+                location.reload();
             }
         };
 
-        // --- ADMIN CONTROLLER ---
-        const admin = {
-            init() {
-                // Previne acesso não autorizado via console/url manipulação
-                if (state.currentUser.role === CONFIG.ROLES.USER) {
-                    utils.notify("Acesso negado.", "error");
-                    router.navigate('dashboard');
-                    return;
-                }
-                
-                // Setup de visualização de tipos de boleto
-                document.getElementById('boleto-type').addEventListener('change', (e) => {
-                    const cpfGroup = document.getElementById('boleto-cpf-group');
-                    if (e.target.value === 'global') {
-                        cpfGroup.classList.add('hidden');
-                    } else {
-                        cpfGroup.classList.remove('hidden');
+        /* ========================================
+        BANKING LOGIC (Pix, Cofrinho, Invest)
+        ========================================
+        */
+        let piggyMode = 'deposit'; // or withdraw
+
+        const bank = {
+            listenToBalance: () => {
+                db.ref(`users/${currentUser.cpf}`).on('value', (snap) => {
+                    if(!snap.exists()) return;
+                    const data = snap.val();
+                    currentUser = data; // Keep local sync
+                    
+                    // Animate numbers
+                    $('main-balance').innerText = formatCurrency(data.balance);
+                    $('savings-balance').innerText = formatCurrency(data.savings);
+                    $('piggy-balance').innerText = formatCurrency(data.piggyBank);
+                });
+            },
+
+            loadHistory: () => {
+                db.ref(`transactions/${currentUser.cpf}`).limitToLast(10).on('value', (snap) => {
+                    const list = $('transaction-list');
+                    list.innerHTML = '';
+                    if(!snap.exists()) {
+                        list.innerHTML = '<div class="text-center text-muted py-3">Sem transações.</div>';
+                        return;
                     }
+
+                    const txs = [];
+                    snap.forEach(c => txs.push(c.val()));
+                    txs.reverse().forEach(tx => {
+                        const isPlus = tx.type === 'in';
+                        const html = `
+                            <div class="transaction-item">
+                                <div class="flex items-center">
+                                    <div class="t-icon">${isPlus ? '<i class="fas fa-arrow-down"></i>' : '<i class="fas fa-arrow-up"></i>'}</div>
+                                    <div class="t-info">
+                                        <h4>${tx.title}</h4>
+                                        <span>${new Date(tx.date).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <div class="t-amount ${isPlus ? 'plus' : 'minus'}">
+                                    ${isPlus ? '+' : '-'} ${formatCurrency(tx.amount)}
+                                </div>
+                            </div>
+                        `;
+                        list.innerHTML += html;
+                    });
+                });
+            },
+
+            sendPix: async () => {
+                const destCpf = $('pix-dest-cpf').value.replace(/\D/g, '');
+                const amount = parseFloat($('pix-amount').value);
+
+                if(!destCpf || destCpf.length !== 11) return toast('CPF destinatário inválido', 'error');
+                if(isNaN(amount) || amount <= 0) return toast('Valor inválido', 'error');
+                if(amount > currentUser.balance) return toast('Saldo insuficiente', 'error');
+                if(destCpf === currentUser.cpf) return toast('Não pode enviar para si mesmo', 'error');
+
+                // Check dest
+                const destSnap = await db.ref(`users/${destCpf}`).get();
+                if(!destSnap.exists()) return toast('Chave Pix não encontrada', 'error');
+
+                // Transaction Atomic Logic would be better with cloud functions, but using client-side transactions here:
+                
+                // 1. Deduct Sender
+                const newSenderBal = currentUser.balance - amount;
+                await db.ref(`users/${currentUser.cpf}`).update({ balance: newSenderBal });
+
+                // 2. Add Receiver
+                const destData = destSnap.val();
+                await db.ref(`users/${destCpf}`).update({ balance: destData.balance + amount });
+
+                // 3. Log Sender
+                bank.logTransaction(currentUser.cpf, 'out', amount, `Envio Pix para ${destData.name}`);
+
+                // 4. Log Receiver
+                bank.logTransaction(destCpf, 'in', amount, `Pix recebido de ${currentUser.name}`);
+
+                toast('Pix enviado com sucesso!', 'success');
+                $('pix-send-form').reset();
+            },
+
+            togglePiggyMode: (mode) => {
+                piggyMode = mode;
+                toast(mode === 'deposit' ? 'Modo: Guardar' : 'Modo: Resgatar', 'success');
+            },
+
+            handlePiggy: async () => {
+                const amount = parseFloat($('piggy-amount').value);
+                if(isNaN(amount) || amount <= 0) return toast('Valor inválido', 'error');
+
+                if(piggyMode === 'deposit') {
+                    if(amount > currentUser.balance) return toast('Saldo insuficiente', 'error');
+                    await db.ref(`users/${currentUser.cpf}`).update({
+                        balance: currentUser.balance - amount,
+                        piggyBank: (currentUser.piggyBank || 0) + amount
+                    });
+                    bank.logTransaction(currentUser.cpf, 'out', amount, 'Guardado no Cofrinho');
+                } else {
+                    if(amount > currentUser.piggyBank) return toast('Saldo no cofrinho insuficiente', 'error');
+                    await db.ref(`users/${currentUser.cpf}`).update({
+                        balance: currentUser.balance + amount,
+                        piggyBank: currentUser.piggyBank - amount
+                    });
+                    bank.logTransaction(currentUser.cpf, 'in', amount, 'Resgate do Cofrinho');
+                }
+                closeModal('deposit-modal');
+                toast('Cofrinho atualizado!', 'success');
+            },
+
+            invest: async () => {
+                const amount = parseFloat($('invest-amount').value);
+                if(isNaN(amount) || amount < 50) return toast('Mínimo R$ 50,00', 'error');
+                if(amount > currentUser.balance) return toast('Saldo insuficiente', 'error');
+
+                // Logic: 15% win
+                const win = Math.random() < 0.15;
+                let newBalance = currentUser.balance - amount; // deduct wager
+                let resultMsg = "";
+
+                if(win) {
+                    const profit = amount * 2;
+                    newBalance += profit;
+                    resultMsg = `<span class="text-success">WIN (+${formatCurrency(profit)})</span>`;
+                    bank.logTransaction(currentUser.cpf, 'in', profit - amount, 'Lucro Investimento');
+                } else {
+                    resultMsg = `<span class="text-danger">LOSS (-${formatCurrency(amount)})</span>`;
+                    bank.logTransaction(currentUser.cpf, 'out', amount, 'Perda Investimento');
+                }
+
+                await db.ref(`users/${currentUser.cpf}`).update({ balance: newBalance });
+                
+                const history = $('invest-history');
+                history.innerHTML = `<div class="p-2 border-bottom flex justify-between"><span>${new Date().toLocaleTimeString()}</span> ${resultMsg}</div>` + history.innerHTML;
+                toast(win ? 'VOCÊ GANHOU!' : 'Você perdeu.', win ? 'success' : 'error');
+            },
+
+            logTransaction: (cpf, type, amount, title) => {
+                db.ref(`transactions/${cpf}`).push({
+                    type, amount, title, date: getTimestamp()
+                });
+            }
+        };
+
+        // Pix Form Listener
+        $('pix-send-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            bank.sendPix();
+        });
+
+        function copyPixKey() {
+            navigator.clipboard.writeText(currentUser.cpf);
+            toast('Chave Pix copiada!', 'success');
+        }
+
+        /* ========================================
+        STORE LOGIC
+        ========================================
+        */
+        const store = {
+            products: [],
+
+            loadProducts: () => {
+                db.ref('products').on('value', (snap) => {
+                    const grid = $('store-container');
+                    grid.innerHTML = '';
+                    store.products = [];
+                    
+                    if(!snap.exists()) {
+                        // Seed default products if empty
+                        if(currentUser.role === 'admin') store.seedProducts();
+                        grid.innerHTML = '<p class="text-center w-full">Nenhum produto encontrado.</p>';
+                        return;
+                    }
+
+                    snap.forEach(child => {
+                        const p = child.val();
+                        p.key = child.key;
+                        store.products.push(p);
+                        store.renderProduct(p);
+                    });
+                });
+            },
+
+            seedProducts: () => {
+                // Default items
+                const items = [
+                    { name: 'iPhone 15 Pro', price: 8500, category: 'Tecnologia', img: 'fa-mobile-alt' },
+                    { name: 'VIP Gold (30d)', price: 50, category: 'VIP', img: 'fa-crown' },
+                    { name: 'Notebook Gamer', price: 12000, category: 'Tecnologia', img: 'fa-laptop' },
+                    { name: 'Tênis Jordan', price: 1500, category: 'Roupas', img: 'fa-shoe-prints' }
+                ];
+                items.forEach(i => db.ref('products').push(i));
+            },
+
+            renderProduct: (p) => {
+                const html = `
+                    <div class="product-card" data-cat="${p.category}">
+                        <div class="product-img">
+                            <i class="fas ${p.img || 'fa-box'}"></i>
+                            <span class="product-badge">${p.category}</span>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-cat">${p.category}</span>
+                            <div class="product-title">${p.name}</div>
+                            <div class="product-price">${formatCurrency(p.price)}</div>
+                            <button class="add-cart-btn" onclick="cart.add('${p.key}')">
+                                Adicionar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                $('store-container').innerHTML += html;
+            },
+
+            filter: (cat) => {
+                const cards = document.querySelectorAll('.product-card');
+                cards.forEach(c => {
+                    if(cat === 'all' || c.dataset.cat === cat) c.style.display = 'flex';
+                    else c.style.display = 'none';
+                });
+            },
+
+            checkout: async () => {
+                const total = cartItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                if(total === 0) return toast('Carrinho vazio', 'error');
+                if(total > currentUser.balance) return toast('Saldo insuficiente', 'error');
+
+                // Process Payment
+                await db.ref(`users/${currentUser.cpf}`).update({
+                    balance: currentUser.balance - total
                 });
 
-                this.refreshLogs();
+                // Log Order
+                const orderId = generateId();
+                const order = {
+                    id: orderId,
+                    items: cartItems,
+                    total: total,
+                    date: getTimestamp(),
+                    status: 'Concluído'
+                };
+                
+                db.ref(`orders/${currentUser.cpf}`).push(order);
+                bank.logTransaction(currentUser.cpf, 'out', total, `Compra Mercado #${orderId}`);
+
+                // Clear
+                cart.clear();
+                cart.close();
+                toast('Compra realizada com sucesso!', 'success');
+            }
+        };
+
+        const cart = {
+            add: (key) => {
+                const prod = store.products.find(p => p.key === key);
+                const existing = cartItems.find(i => i.key === key);
+                
+                if(existing) existing.qty++;
+                else cartItems.push({ ...prod, qty: 1 });
+                
+                cart.updateUI();
+                toast(`${prod.name} adicionado!`, 'success');
+            },
+            
+            remove: (key) => {
+                cartItems = cartItems.filter(i => i.key !== key);
+                cart.updateUI();
             },
 
-            async createBoleto(e) {
-                e.preventDefault();
-                utils.toggleLoading(true);
-
-                const type = document.getElementById('boleto-type').value;
-                const amount = parseFloat(document.getElementById('boleto-amount').value);
-                const desc = document.getElementById('boleto-desc').value;
-
-                try {
-                    if (type === 'individual') {
-                        const targetCpf = utils.cleanCPF(document.getElementById('boleto-cpf').value);
-                        
-                        // Validar usuario
-                        const target = await api.get(`users/${targetCpf}`);
-                        if(!target) throw new Error("CPF não encontrado");
-
-                        // Debitar direto (Modo RP: Boleto já desconta ou cria dívida? 
-                        // O prompt diz "Criar boletos... Enviar boletos". 
-                        // Vamos debitar direto para simplificar o fluxo de "Cobrança Forçada" típica de RP)
-                        const newBal = target.balance - amount;
-                        await api.patch(`users/${targetCpf}`, { balance: newBal });
-                        
-                        // Log
-                        await api.post('logs', {
-                            type: 'BOLETO_FORCED',
-                            cpf: targetCpf,
-                            amount: amount,
-                            reason: desc,
-                            admin: state.currentUser.name,
-                            date: utils.getDateTime()
-                        });
-
-                        utils.notify(`Cobrança aplicada a ${target.name}`, "success");
-
-                    } else if (type === 'global') {
-                        // MASTER ONLY
-                        if (state.currentUser.role !== CONFIG.ROLES.MASTER) {
-                            throw new Error("Apenas MASTER pode emitir boletos globais.");
-                        }
-
-                        // Busca todos (perigoso se base enorme, ok para demo)
-                        const allUsers = await api.get('users');
-                        if (!allUsers) throw new Error("Sem usuários.");
-
-                        let count = 0;
-                        for (const [keyCpf, userData] of Object.entries(allUsers)) {
-                            // Ignora admins na cobrança global (opcional)
-                            if (userData.role === CONFIG.ROLES.USER) {
-                                const newBal = (userData.balance || 0) - amount;
-                                // Fire and forget para agilidade, sem await no loop idealmente, 
-                                // mas JS single thread precisa de cuidado. Faremos sequencial.
-                                await api.patch(`users/${keyCpf}`, { balance: newBal });
-                                count++;
-                            }
-                        }
-
-                        await api.post('logs', {
-                            type: 'GLOBAL_TAX',
-                            amount: amount,
-                            affected: count,
-                            admin: state.currentUser.name,
-                            date: utils.getDateTime()
-                        });
-
-                        utils.notify(`Taxa global aplicada a ${count} cidadãos.`, "success");
-                    }
-                } catch (err) {
-                    utils.notify(err.message || "Erro na operação.", "error");
-                } finally {
-                    utils.toggleLoading(false);
-                    document.getElementById('view-admin').querySelector('form').reset();
-                }
+            clear: () => {
+                cartItems = [];
+                cart.updateUI();
             },
 
-            async refreshLogs() {
-                const tbody = document.getElementById('admin-logs-body');
-                tbody.innerHTML = '<tr><td colspan="3">Carregando auditoria...</td></tr>';
+            updateUI: () => {
+                const count = cartItems.reduce((acc, i) => acc + i.qty, 0);
+                $('cart-count').innerText = count;
+                
+                const list = $('cart-items');
+                list.innerHTML = '';
+                let total = 0;
 
-                const logs = await api.get('logs');
-                tbody.innerHTML = '';
-
-                if (!logs) {
-                    tbody.innerHTML = '<tr><td colspan="3">Sem registros.</td></tr>';
-                    return;
-                }
-
-                // Converter para array e ordenar
-                const logArray = Object.values(logs).sort((a,b) => b.date.localeCompare(a.date)).slice(0, 20);
-
-                logArray.forEach(log => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="text-xs">${log.date}</td>
-                        <td class="text-sm font-bold">${log.type}</td>
-                        <td class="text-xs">
-                            ${log.cpf ? 'User:' + log.cpf : ''} <br>
-                            ${log.amount ? 'R$ ' + log.amount : ''} <br>
-                            ${log.details || log.desc || ''}
-                        </td>
+                cartItems.forEach(i => {
+                    const sub = i.price * i.qty;
+                    total += sub;
+                    list.innerHTML += `
+                        <div class="flex justify-between items-center mb-2 border-bottom pb-2">
+                            <div>
+                                <strong>${i.name}</strong><br>
+                                <small>${i.qty}x ${formatCurrency(i.price)}</small>
+                            </div>
+                            <div class="text-right">
+                                <div>${formatCurrency(sub)}</div>
+                                <button class="text-danger" onclick="cart.remove('${i.key}')" style="background:none;">Remover</button>
+                            </div>
+                        </div>
                     `;
-                    tbody.appendChild(tr);
                 });
-            }
-        };
-
-        // --- INVESTIMENTOS ---
-        const invest = {
-            async play(e) {
-                e.preventDefault();
-                const amount = parseFloat(document.getElementById('invest-amount').value);
-                const resDiv = document.getElementById('invest-result');
-                
-                if(amount > state.currentUser.balance) return utils.notify("Saldo insuficiente", "error");
-
-                utils.toggleLoading(true);
-
-                // Simulando delay de mercado
-                setTimeout(async () => {
-                    const win = Math.random() < 0.15; // 15% chance
-                    let newBalance = 0;
-                    
-                    if (win) {
-                        const profit = amount * 5;
-                        newBalance = state.currentUser.balance + profit; // Devolve aposta + lucro? Não, ganha 5x o valor. O valor original já estava no saldo.
-                        // Correção lógica: Se eu tenho 100, aposto 10.
-                        // Win: Ganho 50. Saldo = 100 - 10 (aposta) + 50 (premio) = 140.
-                        // Vamos simplificar: Deduz aposta primeiro.
-                        
-                        // Atualiza logica
-                        const currentBal = state.currentUser.balance - amount;
-                        const finalBal = currentBal + (amount * 5);
-                        
-                        await api.patch(`users/${state.currentUser.cpf}`, { balance: finalBal });
-                        
-                        resDiv.innerHTML = `<span class="text-success text-xl">LUCRO! Você ganhou R$ ${utils.formatCurrency(amount * 5)}</span>`;
-                        utils.notify("Retorno de Investimento Recebido!", "success");
-
-                        await api.post('logs', {
-                            type: 'INVEST_WIN',
-                            cpf: state.currentUser.cpf,
-                            amount: amount * 5,
-                            date: utils.getDateTime()
-                        });
-                    } else {
-                        const finalBal = state.currentUser.balance - amount;
-                        await api.patch(`users/${state.currentUser.cpf}`, { balance: finalBal });
-                        
-                        resDiv.innerHTML = `<span class="text-danger">Perda Total. O mercado oscilou.</span>`;
-                        utils.notify("Investimento Liquidado.", "warning");
-
-                        await api.post('logs', {
-                            type: 'INVEST_LOSS',
-                            cpf: state.currentUser.cpf,
-                            amount: amount,
-                            date: utils.getDateTime()
-                        });
-                    }
-
-                    // Refresh balance visual only
-                    const updatedUser = await api.get(`users/${state.currentUser.cpf}`);
-                    state.currentUser.balance = updatedUser.balance;
-                    
-                    utils.toggleLoading(false);
-                }, 1500);
-            }
-        };
-
-        // --- CARDS MODULE ---
-        const cards = {
-            init() {
-                if(state.currentUser) {
-                    document.getElementById('card-display-name').innerText = state.currentUser.name;
-                }
+                $('cart-total').innerText = formatCurrency(total);
             },
-            generateVirtual() {
-                utils.toggleLoading(true);
-                setTimeout(() => {
-                    utils.toggleLoading(false);
-                    utils.notify("Novo CVV Gerado: " + Math.floor(Math.random() * 899 + 100), "success");
-                }, 1000);
+
+            open: () => openModal('cart-modal'),
+            close: () => closeModal('cart-modal')
+        };
+
+        /* ========================================
+        ADMIN LOGIC
+        ========================================
+        */
+        const admin = {
+            addProduct: () => {
+                const name = $('prod-name').value;
+                const price = parseFloat($('prod-price').value);
+                const cat = $('prod-cat').value;
+                const img = $('prod-img').value; // expects icon class or url logic
+
+                if(!name || !price) return toast('Dados inválidos', 'error');
+
+                db.ref('products').push({
+                    name, price, category: cat || 'Geral', img: img || 'fa-box'
+                });
+                
+                toast('Produto criado', 'success');
+                $('add-product-form').reset();
+            },
+            renderProductForm: () => {
+                $('admin-panel-content').classList.remove('hidden');
+            },
+            viewLogs: () => {
+                // Simplified log view
+                toast('Logs disponíveis no console do Firebase', 'success');
             }
         };
 
-        // --- CHATBOT ---
-        const chatbot = {
-            send(e) {
-                e.preventDefault();
-                const input = document.getElementById('chat-input');
-                const text = input.value.trim().toLowerCase();
-                const feed = document.getElementById('chat-feed');
+        /* ========================================
+        AI HELP LOGIC
+        ========================================
+        */
+        const helpAI = {
+            send: () => {
+                const input = $('chat-input');
+                const text = input.value.toLowerCase();
+                if(!text) return;
 
-                if (!text) return;
-
-                // User msg
-                const uDiv = document.createElement('div');
-                uDiv.className = 'msg msg-user';
-                uDiv.innerText = input.value;
-                feed.appendChild(uDiv);
-
+                // Add User Bubble
+                helpAI.addBubble(input.value, 'user');
                 input.value = '';
 
-                // Bot Logic
+                // Simulate processing
                 setTimeout(() => {
-                    let reply = "Desculpe, não entendi. Tente 'pix', 'saldo' ou 'cartão'.";
+                    let response = "Desculpe, não entendi. Tente perguntar sobre 'pix', 'saldo', 'loja' ou 'segurança'.";
                     
-                    if (text.includes('pix')) reply = "O PIX funciona 24h. Vá na aba 'Serviços' > 'PIX' e digite o CPF do destinatário.";
-                    if (text.includes('saldo') || text.includes('dinheiro')) reply = `Seu saldo atual é de R$ ${utils.formatCurrency(state.currentUser.balance)}.`;
-                    if (text.includes('cartão') || text.includes('limite')) reply = "Seu cartão Imperial Black possui limite dinâmico baseado em sua reputação no RP.";
-                    if (text.includes('invest') || text.includes('ganhar')) reply = "Temos o Investimento de Alto Risco. Cuidado! Há 85% de chance de perda.";
-                    if (text.includes('admin') || text.includes('dono')) reply = "Funções administrativas são restritas ao Sr. Ryan e Master.";
-
-                    const bDiv = document.createElement('div');
-                    bDiv.className = 'msg msg-bot';
-                    bDiv.innerText = reply;
-                    feed.appendChild(bDiv);
-                    feed.scrollTop = feed.scrollHeight;
-                }, 600);
+                    if(text.includes('pix')) response = "O PIX no Banco Imperial é instantâneo. Vá até a aba 'Área Pix', digite o CPF do destinatário e o valor. Lembre-se: transferências são irreversíveis.";
+                    else if(text.includes('saldo') || text.includes('dinheiro')) response = "Seu saldo é atualizado em tempo real. Você pode ver seu saldo total, poupança e cofrinho na tela inicial.";
+                    else if(text.includes('loja') || text.includes('comprar')) response = "Nossa loja debita diretamente do seu saldo. Basta adicionar ao carrinho e finalizar. Entregamos itens digitais na hora.";
+                    else if(text.includes('cofrinho')) response = "O Cofrinho serve para separar dinheiro do saldo principal, evitando gastos acidentais.";
+                    else if(text.includes('senha') || text.includes('roubo')) response = "Se sua conta foi comprometida, contate um Admin (Ryan_Imperial) imediatamente. Nunca passamos senhas por email.";
+                    
+                    helpAI.addBubble(response, 'bot');
+                }, 800);
+            },
+            
+            addBubble: (txt, type) => {
+                const win = $('chat-window');
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${type}`;
+                bubble.innerText = txt;
+                win.appendChild(bubble);
+                win.scrollTop = win.scrollHeight;
             }
         };
 
-        // --- GLOBAL & UI HELPERS ---
-        const app = {
-            toggleHighContrast() {
-                document.body.classList.toggle('high-contrast');
-            }
-        };
-
-        // Init Check
-        // Se houver sessão (sessionStorage) poderia restaurar aqui, mas para segurança Enterprise,
-        // forçamos login novo no refresh da página.
+        // Initialize
+        window.addEventListener('load', () => {
+            initTheme();
+            auth.init();
+        });
 
     </script>
 </body>
