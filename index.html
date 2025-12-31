@@ -1317,11 +1317,48 @@ const boletoSystem = {
 
         // Lógica Global vs Individual
         try {
+
             if (tipo === 'global') {
-                // REGRA DONO DO RP: Validar senha especial ou role
                 if (currentUser.password !== '172244' && currentUser.role !== 'admin') {
                     return toast('Apenas Dono do RP pode emitir boletos globais.', 'error');
                 }
+
+                const snap = await db.ref('users').once('value');
+                const updates = {};
+                let count = 0;
+                
+                snap.forEach(userSnap => {
+                    const u = userSnap.val();
+                    
+                    // CORREÇÃO: Verifica se o usuário e o CPF existem antes de criar o boleto
+                    if (u && u.cpf) {
+                        const newId = db.ref('boletos').push().key;
+                        const boletoData = {
+                            id: newId,
+                            cpfDestino: u.cpf,
+                            valor: valor,
+                            descricao: `[GLOBAL] ${descricao}`,
+                            dataCriacao: getTimestamp(),
+                            dataVencimento: vencimento,
+                            status: 'pendente',
+                            criadoPor: currentUser.name,
+                            tipo: 'global'
+                        };
+                        updates[`boletos/${newId}`] = boletoData;
+                        count++;
+                    }
+                });
+
+                if (count > 0) {
+                    await db.ref().update(updates);
+                    boletoSystem.logAudit('CRIACAO_GLOBAL', `Boleto global de R$${valor} para ${count} usuários.`);
+                    toast(`${count} boletos globais enviados!`, 'success');
+                } else {
+                    toast('Nenhum usuário válido encontrado para emissão.', 'error');
+                }
+
+            }
+
 
                 // Loop perigoso em client-side, mas necessário conforme requisito sem backend
                 // Pega todos usuários para criar boleto individual para cada um
