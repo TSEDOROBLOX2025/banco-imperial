@@ -360,6 +360,27 @@
         }
         @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
+        /* COLE NO FINAL DA TAG <STYLE> */
+.boleto-item {
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-body);
+}
+.boleto-info h4 { font-size: 1rem; margin-bottom: 5px; }
+.boleto-info span { font-size: 0.8rem; display: block; color: var(--text-muted); }
+.status-badge {
+    padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;
+}
+.status-pendente { background: rgba(253, 203, 110, 0.2); color: var(--warning); }
+.status-pago { background: rgba(0, 184, 148, 0.2); color: var(--success); }
+.status-cancelado { background: rgba(214, 48, 49, 0.2); color: var(--danger); }
+.status-vencido { background: #2d3436; color: white; }
+        
     </style>
 </head>
 <body>
@@ -405,6 +426,9 @@
             </div>
             <div class="nav-item" onclick="navigate('store')">
                 <i class="fas fa-shopping-bag"></i> <span>Mercado</span>
+            </div>
+            <div class="nav-item" onclick="navigate('boletos')">
+                <i class="fas fa-file-invoice-dollar"></i> <span>Boletos</span>
             </div>
             <div class="nav-item" onclick="navigate('invest')">
                 <i class="fas fa-chart-line"></i> <span>Investir</span>
@@ -533,6 +557,69 @@
                     <div id="invest-history"></div>
                 </div>
             </section>
+
+            <section id="boletos" class="page-section hidden">
+    <div class="section-header">
+        <div class="page-title">
+            <h2><i class="fas fa-file-invoice"></i> Central de Boletos</h2>
+            <p class="text-muted">Gerencie suas faturas e cobranças</p>
+        </div>
+        <button id="btn-novo-boleto" class="btn btn-primary hidden" onclick="boletoSystem.toggleForm()">
+            <i class="fas fa-plus"></i> Novo Boleto
+        </button>
+    </div>
+
+    <div id="form-criar-boleto" class="card mb-2 hidden" style="border-left: 5px solid var(--primary);">
+        <h3>Emitir Novo Boleto</h3>
+        <form id="form-boleto" class="mt-2">
+            <div class="grid-2-col flex gap-2">
+                <div class="input-group w-full">
+                    <label>CPF do Pagador (Destino)</label>
+                    <input type="text" id="bol-cpf" class="input-field" placeholder="000.000.000-00" maxlength="14">
+                </div>
+                <div class="input-group w-full">
+                    <label>Valor (R$)</label>
+                    <input type="number" id="bol-valor" class="input-field" placeholder="0.00">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Descrição / Motivo</label>
+                <input type="text" id="bol-desc" class="input-field" placeholder="Ex: Multa de Trânsito / Compra VIP">
+            </div>
+            <div class="grid-2-col flex gap-2">
+                <div class="input-group w-full">
+                    <label>Vencimento</label>
+                    <input type="date" id="bol-venc" class="input-field">
+                </div>
+                <div class="input-group w-full">
+                    <label>Tipo de Emissão</label>
+                    <select id="bol-tipo" class="input-field">
+                        <option value="individual">Individual (CPF Específico)</option>
+                        <option value="global">GLOBAL (Todos os Usuários)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" class="btn btn-success w-full" onclick="boletoSystem.criar()">EMITIR BOLETO</button>
+        </form>
+    </div>
+
+    <div class="grid-2-col" style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+        
+        <div class="card">
+            <h3 class="text-warning"><i class="fas fa-clock"></i> Pendentes</h3>
+            <div id="lista-boletos-pendentes" class="mt-2">
+                <p class="text-muted text-center">Carregando...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="text-success"><i class="fas fa-check-double"></i> Histórico / Pagos</h3>
+            <div id="lista-boletos-historico" class="mt-2">
+                <p class="text-muted text-center">Nenhum histórico.</p>
+            </div>
+        </div>
+    </div>
+</section>
             
             <section id="help" class="page-section hidden">
                 <div class="card" style="height: 60vh; display: flex; flex-direction: column;">
@@ -701,9 +788,8 @@
             $(sectionId).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             // Highlight nav
-            const navMap = { 'home':0, 'pix':1, 'store':2, 'invest':3, 'cards':4, 'help':5 };
-            if(navMap[sectionId] !== undefined) document.querySelectorAll('.nav-item')[navMap[sectionId]].classList.add('active');
-            
+            const navMap = { 'home':0, 'pix':1, 'store':2, 'invest':3, 'cards':4, 'help':5, 'boletos':6 };            
+                if(navMap[sectionId] !== undefined) document.querySelectorAll('.nav-item')[navMap[sectionId]].classList.add('active');
             $('page-heading').innerText = sectionId === 'home' ? 'Visão Geral' : 
                                           sectionId === 'pix' ? 'Área Pix' : 
                                           sectionId === 'store' ? 'Mercado Imperial' :
@@ -792,6 +878,9 @@
                 bank.listenToBalance();
                 bank.loadHistory();
                 store.loadProducts();
+                // Adicione esta linha dentro de auth.setSession
+boletoSystem.init();
+
 
                 // Admin Check
                 if(user.role === 'admin' || user.password === 'ryan_imperial') {
@@ -1166,7 +1255,7 @@
                     else if(text.includes('saldo') || text.includes('dinheiro')) response = "Seu saldo é atualizado em tempo real. Você pode ver seu saldo total, poupança e cofrinho na tela inicial.";
                     else if(text.includes('loja') || text.includes('comprar')) response = "Nossa loja debita diretamente do seu saldo. Basta adicionar ao carrinho e finalizar. Entregamos itens digitais na hora.";
                     else if(text.includes('cofrinho')) response = "O Cofrinho serve para separar dinheiro do saldo principal, evitando gastos acidentais.";
-                    else if(text.includes('senha') || text.includes('roubo')) response = "Se sua conta foi comprometida, contate um Admin (Ryan_Imperial) imediatamente. Nunca passamos senhas por email.";
+                    else if(text.includes('senha') || text.includes('roubo')) response = "Se sua conta foi comprometida, contate um Admin imediatamente. Nunca passamos senhas por email.";
                     
                     helpAI.addBubble(response, 'bot');
                 }, 800);
@@ -1188,6 +1277,237 @@
             auth.init();
         });
 
+/* ========================================
+   SISTEMA DE BOLETOS (INJECTED)
+   ========================================
+*/
+const boletoSystem = {
+    init: () => {
+        // Verifica permissões para mostrar botão de criar
+        if (currentUser.role === 'admin' || currentUser.cpf === 'DONO_DO_RP') {
+            const btn = document.getElementById('btn-novo-boleto');
+            if(btn) btn.classList.remove('hidden');
+        }
+        boletoSystem.listar();
+    },
+
+    toggleForm: () => {
+        const form = document.getElementById('form-criar-boleto');
+        if(form) form.classList.toggle('hidden');
+    },
+
+    criar: async () => {
+        // 1. Validar Permissão
+        if (currentUser.role !== 'admin' && currentUser.password !== '172244') {
+            toast('Acesso negado: Apenas Admins criam boletos.', 'error');
+            return;
+        }
+
+        // 2. Coletar Dados
+        const cpfDestino = document.getElementById('bol-cpf').value.replace(/\D/g, '');
+        const valor = parseFloat(document.getElementById('bol-valor').value);
+        const descricao = document.getElementById('bol-desc').value;
+        const vencimento = document.getElementById('bol-venc').value;
+        const tipo = document.getElementById('bol-tipo').value; // individual ou global
+
+        // 3. Validações Básicas
+        if (!valor || valor <= 0) return toast('Valor inválido.', 'error');
+        if (!descricao) return toast('Descrição obrigatória.', 'error');
+        if (!vencimento) return toast('Data de vencimento obrigatória.', 'error');
+
+        // Lógica Global vs Individual
+        try {
+            if (tipo === 'global') {
+                // REGRA DONO DO RP: Validar senha especial ou role
+                if (currentUser.password !== '172244' && currentUser.role !== 'admin') {
+                    return toast('Apenas Dono do RP pode emitir boletos globais.', 'error');
+                }
+
+                // Loop perigoso em client-side, mas necessário conforme requisito sem backend
+                // Pega todos usuários para criar boleto individual para cada um
+                const snap = await db.ref('users').once('value');
+                const updates = {};
+                
+                snap.forEach(userSnap => {
+                    const u = userSnap.val();
+                    const newId = db.ref('boletos').push().key;
+                    const boletoData = {
+                        id: newId,
+                        cpfDestino: u.cpf,
+                        valor: valor,
+                        descricao: `[GLOBAL] ${descricao}`,
+                        dataCriacao: getTimestamp(),
+                        dataVencimento: vencimento,
+                        status: 'pendente',
+                        criadoPor: currentUser.name,
+                        tipo: 'global'
+                    };
+                    updates[`boletos/${newId}`] = boletoData;
+                });
+
+                await db.ref().update(updates);
+                boletoSystem.logAudit('CRIACAO_GLOBAL', `Boleto global de R$${valor} criado por ${currentUser.name}`);
+                toast('Boletos globais enviados com sucesso!', 'success');
+
+            } else {
+                // Individual
+                if (cpfDestino.length !== 11) return toast('CPF inválido.', 'error');
+                
+                // Verifica se usuário existe
+                const userCheck = await db.ref(`users/${cpfDestino}`).get();
+                if (!userCheck.exists()) return toast('Usuário destino não encontrado.', 'error');
+
+                const newId = db.ref('boletos').push().key;
+                const boletoData = {
+                    id: newId,
+                    cpfDestino: cpfDestino,
+                    valor: valor,
+                    descricao: descricao,
+                    dataCriacao: getTimestamp(),
+                    dataVencimento: vencimento,
+                    status: 'pendente',
+                    criadoPor: currentUser.name,
+                    tipo: 'individual'
+                };
+
+                await db.ref(`boletos/${newId}`).set(boletoData);
+                boletoSystem.logAudit('CRIACAO', `Boleto para ${cpfDestino} valor R$${valor}`);
+                toast('Boleto enviado com sucesso!', 'success');
+            }
+
+            document.getElementById('form-boleto').reset();
+            boletoSystem.toggleForm();
+
+        } catch (err) {
+            console.error(err);
+            toast('Erro ao criar boleto: ' + err.message, 'error');
+        }
+    },
+
+    pagar: async (boletoId, valorBoleto) => {
+        if (!confirm(`Confirmar pagamento de R$ ${valorBoleto}?`)) return;
+
+        try {
+            const boletoRef = db.ref(`boletos/${boletoId}`);
+            const boletoSnap = await boletoRef.get();
+            const boleto = boletoSnap.val();
+
+            // Validações de Segurança
+            if (!boleto) return toast('Boleto não existe.', 'error');
+            if (boleto.status !== 'pendente') return toast('Boleto já pago ou cancelado.', 'error');
+            if (currentUser.balance < valorBoleto) return toast('Saldo insuficiente.', 'error');
+
+            // 1. Debitar Usuário
+            const novoSaldoUser = currentUser.balance - valorBoleto;
+            
+            // ATUALIZAÇÃO ATÔMICA
+            const updates = {};
+            updates[`users/${currentUser.cpf}/balance`] = novoSaldoUser;
+            updates[`boletos/${boletoId}/status`] = 'pago';
+            updates[`boletos/${boletoId}/dataPagamento`] = getTimestamp();
+
+            await db.ref().update(updates);
+
+            // 2. Logs
+            bank.logTransaction(currentUser.cpf, 'out', valorBoleto, `Pagamento Boleto: ${boleto.descricao}`);
+            boletoSystem.logAudit('PAGAMENTO', `Boleto ${boletoId} pago por ${currentUser.cpf}`);
+
+            toast('Boleto pago com sucesso!', 'success');
+
+        } catch (err) {
+            toast('Erro no processamento: ' + err.message, 'error');
+        }
+    },
+
+    cancelar: async (boletoId) => {
+        if (currentUser.role !== 'admin') return toast('Apenas admins podem cancelar.', 'error');
+        if (!confirm('Deseja realmente cancelar este boleto?')) return;
+
+        try {
+            await db.ref(`boletos/${boletoId}`).update({
+                status: 'cancelado',
+                canceladoPor: currentUser.name,
+                dataCancelamento: getTimestamp()
+            });
+            boletoSystem.logAudit('CANCELAMENTO', `Boleto ${boletoId} cancelado por admin.`);
+            toast('Boleto cancelado.', 'success');
+        } catch (err) {
+            toast('Erro ao cancelar.', 'error');
+        }
+    },
+
+    listar: () => {
+        // Escuta em tempo real
+        db.ref('boletos').on('value', (snapshot) => {
+            const listaPendentes = document.getElementById('lista-boletos-pendentes');
+            const listaHistorico = document.getElementById('lista-boletos-historico');
+            
+            if (!listaPendentes || !listaHistorico) return; // Segurança se a aba não estiver carregada
+
+            listaPendentes.innerHTML = '';
+            listaHistorico.innerHTML = '';
+
+            if (!snapshot.exists()) {
+                listaPendentes.innerHTML = '<p class="text-muted text-center">Nenhum boleto.</p>';
+                return;
+            }
+
+            snapshot.forEach((child) => {
+                const b = child.val();
+                const isMine = b.cpfDestino === currentUser.cpf;
+                const isAdmin = currentUser.role === 'admin';
+
+                // Filtro: Mostra se for meu OU se eu for admin
+                if (isMine || isAdmin) {
+                    const statusClass = `status-${b.status.toLowerCase()}`;
+                    const icon = b.status === 'pendente' ? 'fa-exclamation-circle' : 'fa-check-circle';
+                    
+                    // Botão de Ação (Pagar ou Cancelar)
+                    let actionBtn = '';
+                    if (b.status === 'pendente') {
+                        if (isMine) {
+                            actionBtn = `<button class="btn btn-success btn-sm" onclick="boletoSystem.pagar('${b.id}', ${b.valor})"><i class="fas fa-barcode"></i> Pagar</button>`;
+                        }
+                        if (isAdmin) {
+                            actionBtn += ` <button class="btn btn-danger btn-sm" onclick="boletoSystem.cancelar('${b.id}')"><i class="fas fa-ban"></i></button>`;
+                        }
+                    }
+
+                    const html = `
+                        <div class="boleto-item">
+                            <div class="boleto-info">
+                                <h4>${b.descricao}</h4>
+                                <span><strong>Valor:</strong> ${formatCurrency(b.valor)}</span>
+                                <span><strong>Vence:</strong> ${b.dataVencimento.split('-').reverse().join('/')}</span>
+                                <span class="text-muted" style="font-size:0.7rem">Destino: ${b.cpfDestino}</span>
+                            </div>
+                            <div class="text-right flex flex-col items-center gap-1">
+                                <span class="status-badge ${statusClass}">${b.status}</span>
+                                <div class="mt-2">${actionBtn}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (b.status === 'pendente') {
+                        listaPendentes.innerHTML += html;
+                    } else {
+                        listaHistorico.innerHTML += html;
+                    }
+                }
+            });
+        });
+    },
+
+    logAudit: (acao, detalhe) => {
+        db.ref('auditorias/boletos').push({
+            acao,
+            detalhe,
+            autor: currentUser.cpf,
+            timestamp: getTimestamp()
+        });
+    }
+};
+        
     </script>
 </body>
 </html>
