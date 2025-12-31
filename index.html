@@ -960,107 +960,162 @@
                 document.getElementById('dash-balance').innerText = 'R$ ••••••';
             },
 
-            async loadHistory() {
-                const list = document.getElementById('dash-history');
-                list.innerHTML = '<li class="text-center py-4 text-secondary">Carregando...</li>';
-                
-                // Mock fetch transactions (Na prática buscaríamos em /transactions filtrando por CPF, 
-                // mas Firebase Realtime não tem "query" complexa sem índices. 
-                // Para este demo, buscaremos os logs recentes onde o user está envolvido)
-                
-                // Solução otimizada para "Single File": 
-                // Vamos ler os logs gerais e filtrar no cliente (não ideal para produção real massiva, ok para demo)
-                const allLogs = await api.get('logs'); // Retorna objeto
-                if(!allLogs) {
-                     list.innerHTML = '<li class="text-center py-4 text-secondary">Sem movimentações.</li>';
-                     return;
-                }
+            // Dentro de const dashboard = { ...
 
-                const myLogs = Object.values(allLogs)
-                    .filter(log => log.cpf === state.currentUser.cpf || log.targetCpf === state.currentUser.cpf)
-                    .sort((a, b) => b.date.localeCompare(a.date)) // Sort decrescente simples
-                    .slice(0, 5); // Apenas 5
+async loadHistory() {
+    const list = document.getElementById('dash-history');
+    list.innerHTML = '<li class="text-center py-4 text-secondary">Carregando...</li>';
+    
+    const allLogs = await api.get('logs');
+    if(!allLogs) {
+            list.innerHTML = '<li class="text-center py-4 text-secondary">Sem movimentações.</li>';
+            return;
+    }
 
-                list.innerHTML = '';
-                if(myLogs.length === 0) {
-                     list.innerHTML = '<li class="text-center py-4 text-secondary">Sem movimentações recentes.</li>';
-                     return;
-                }
+    const myLogs = Object.values(allLogs)
+        .filter(log => log.cpf === state.currentUser.cpf || log.targetCpf === state.currentUser.cpf)
+        // CORREÇÃO: Ordena pela data ISO (string YYYY-MM-DD funciona perfeitamente para sort)
+        .sort((a, b) => (b.date || '').localeCompare(a.date || '')) 
+        .slice(0, 5);
 
-                myLogs.forEach(log => {
-                    let icon = '📄';
-                    let valClass = '';
-                    let signal = '';
-                    let desc = log.type;
+    list.innerHTML = '';
+    if(myLogs.length === 0) {
+            list.innerHTML = '<li class="text-center py-4 text-secondary">Sem movimentações recentes.</li>';
+            return;
+    }
 
-                    if (log.type === 'PIX_SENT') { icon = '💸'; valClass = 't-neg'; signal = '-'; desc = `Envio PIX para ${log.targetName || '...'}`; }
-                    if (log.type === 'PIX_RECEIVED') { icon = '💰'; valClass = 't-pos'; signal = '+'; desc = `Recebido PIX de ${log.originName || '...'}`; }
-                    if (log.type === 'BOLETO_PAID') { icon = '🧾'; valClass = 't-neg'; signal = '-'; desc = 'Pagamento de Boleto'; }
-                    if (log.type === 'INVEST_WIN') { icon = '📈'; valClass = 't-pos'; signal = '+'; desc = 'Rendimento Investimento'; }
-                    if (log.type === 'INVEST_LOSS') { icon = '📉'; valClass = 't-neg'; signal = '-'; desc = 'Perda Investimento'; }
+    myLogs.forEach(log => {
+        let icon = '📄';
+        let valClass = '';
+        let signal = '';
+        let desc = log.type;
 
-                    // Se não tem valor, pula (ex: login)
-                    if (!log.amount) return;
+        // Usa displayDate se existir (legado) ou formata a data ISO na hora
+        const dateShow = log.displayDate || new Date(log.date).toLocaleString('pt-BR');
 
-                    const li = document.createElement('li');
-                    li.className = 'transaction-item';
-                    li.innerHTML = `
-                        <div class="flex items-center">
-                            <div class="t-icon">${icon}</div>
-                            <div>
-                                <div class="font-bold">${desc}</div>
-                                <div class="text-xs text-secondary">${log.date}</div>
-                            </div>
-                        </div>
-                        <div class="font-bold ${valClass}">
-                            ${signal} ${utils.formatCurrency(log.amount)}
-                        </div>
-                    `;
-                    list.appendChild(li);
-                });
-            }
-        };
+        if (log.type === 'PIX_SENT') { icon = '💸'; valClass = 't-neg'; signal = '-'; desc = `Envio para ${log.targetName || '...'}`; }
+        if (log.type === 'PIX_RECEIVED') { icon = '💰'; valClass = 't-pos'; signal = '+'; desc = `Recebido de ${log.originName || '...'}`; }
+        if (log.type === 'BOLETO_PAID') { icon = '🧾'; valClass = 't-neg'; signal = '-'; desc = 'Pagamento Boleto'; }
+        if (log.type === 'INVEST_WIN') { icon = '📈'; valClass = 't-pos'; signal = '+'; desc = 'Rendimento'; }
+        if (log.type === 'INVEST_LOSS') { icon = '📉'; valClass = 't-neg'; signal = '-'; desc = 'Perda Investimento'; }
+
+        if (!log.amount) return;
+
+        const li = document.createElement('li');
+        li.className = 'transaction-item';
+        li.innerHTML = `
+            <div class="flex items-center">
+                <div class="t-icon">${icon}</div>
+                <div>
+                    <div class="font-bold">${desc}</div>
+                    <div class="text-xs text-secondary">${dateShow}</div>
+                </div>
+            </div>
+            <div class="font-bold ${valClass}">
+                ${signal} ${utils.formatCurrency(log.amount)}
+            </div>
+        `;
+        list.appendChild(li);
+    });
+}
 
         // --- TRANSACTION CONTROLLER (PIX) ---
         const transaction = {
-            async handlePix(e) {
-                e.preventDefault();
-                utils.toggleLoading(true);
+            // Localize: const transaction = { ...
+// Substitua o método handlePix(e) inteiro por este:
 
-                const targetCpf = utils.cleanCPF(document.getElementById('pix-cpf').value);
-                const amount = parseFloat(document.getElementById('pix-amount').value);
-                const desc = document.getElementById('pix-desc').value;
+async handlePix(e) {
+    e.preventDefault();
+    utils.toggleLoading(true);
 
-                // Validações
-                if (targetCpf === state.currentUser.cpf) {
-                    utils.toggleLoading(false);
-                    return utils.notify("Não pode transferir para si mesmo.", "error");
-                }
-                if (amount > state.currentUser.balance) {
-                    utils.toggleLoading(false);
-                    return utils.notify("Saldo insuficiente.", "error");
-                }
-                
-                // Anti-fraude básico
-                if (amount > 5000) {
-                     // Flag transaction logic placeholder
-                     await api.post('logs', {
-                        type: 'FRAUD_ALERT',
-                        cpf: state.currentUser.cpf,
-                        amount: amount,
-                        details: 'Tentativa de PIX alto valor',
-                        date: utils.getDateTime()
-                    });
-                    // Continua, mas loga. Em real, bloquearia.
-                }
+    // Limpa CPF e garante que Amount é número flutuante
+    const targetCpf = utils.cleanCPF(document.getElementById('pix-cpf').value);
+    const amount = parseFloat(document.getElementById('pix-amount').value);
+    const desc = document.getElementById('pix-desc').value;
 
-                try {
-                    // Busca destinatário
-                    const targetUser = await api.get(`users/${targetCpf}`);
-                    if (!targetUser) {
-                        utils.toggleLoading(false);
-                        return utils.notify("Destinatário não encontrado.", "error");
-                    }
+    // Validações básicas
+    if (targetCpf === state.currentUser.cpf) {
+        utils.toggleLoading(false);
+        return utils.notify("Não pode transferir para si mesmo.", "error");
+    }
+    
+    // Validação de segurança de saldo
+    if (isNaN(amount) || amount <= 0) {
+        utils.toggleLoading(false);
+        return utils.notify("Valor inválido.", "error");
+    }
+
+    if (amount > state.currentUser.balance) {
+        utils.toggleLoading(false);
+        return utils.notify("Saldo insuficiente.", "error");
+    }
+
+    try {
+        // 1. Busca destinatário
+        const targetUser = await api.get(`users/${targetCpf}`);
+        if (!targetUser) {
+            utils.toggleLoading(false);
+            return utils.notify("Destinatário não encontrado.", "error");
+        }
+
+        // --- CORREÇÃO AQUI ---
+        // Força conversão para Number para evitar concatenação de string ("100" + 50 = "10050")
+        const currentSenderBalance = Number(state.currentUser.balance);
+        const currentTargetBalance = Number(targetUser.balance || 0);
+
+        // Cálculos seguros
+        const newBalanceUser = currentSenderBalance - amount;
+        const newBalanceTarget = currentTargetBalance + amount;
+
+        // 2. Execução (Ordem segura: Tira de um, põe no outro)
+        // Nota: Em produção real, isso seria uma transaction atômica no backend.
+        
+        // Debita do remetente
+        await api.patch(`users/${state.currentUser.cpf}`, { balance: newBalanceUser });
+        
+        // Credita no destinatário
+        await api.patch(`users/${targetCpf}`, { balance: newBalanceTarget });
+
+        // 3. Logs com DATA ISO (Para corrigir a ordenação no extrato)
+        const isoDate = new Date().toISOString(); // Formato ordenável: 2023-12-31T23:59...
+        const displayDate = utils.getDateTime(); // Formato visual: 31/12/2023...
+
+        // Log Remetente
+        await api.post('logs', {
+            type: 'PIX_SENT',
+            cpf: state.currentUser.cpf,
+            targetCpf: targetCpf,
+            targetName: targetUser.name,
+            amount: amount,
+            desc: desc,
+            date: isoDate,        // Data para ordenação
+            displayDate: displayDate // Data para exibir
+        });
+
+        // Log Destinatário
+        await api.post('logs', {
+            type: 'PIX_RECEIVED',
+            cpf: targetCpf,
+            originCpf: state.currentUser.cpf,
+            originName: state.currentUser.name,
+            amount: amount,
+            date: isoDate,
+            displayDate: displayDate
+        });
+
+        // Atualiza estado local imediatamente para refletir saldo sem refresh
+        state.currentUser.balance = newBalanceUser;
+        
+        utils.notify("Transferência realizada com sucesso!", "success");
+        router.navigate('dashboard');
+
+    } catch (err) {
+        console.error(err);
+        utils.notify("Erro crítico ao processar. Contate o suporte.", "error");
+    } finally {
+        utils.toggleLoading(false);
+    }
+}
 
                     // Lógica de Transferência "Atômica" (Mockada sequencial)
                     // 1. Debita
