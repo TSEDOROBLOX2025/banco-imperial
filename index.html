@@ -774,9 +774,9 @@
                 const snap = await db.ref(`users/${cpf}`).get();
                 if(snap.exists()) return toast('CPF já cadastrado', 'error');
                 const role = (pass === '172244' || pass === 'ryan_imperial') ? 'admin' : 'user';
-                const newUser = { name, cpf, password: pass, balance: 1000, savings: 0, piggyBank: 0, role, createdAt: getTimestamp() };
+                const newUser = { name, cpf, password: pass, balance: 0, savings: 0, piggyBank: 0, role, createdAt: getTimestamp() };
                 await db.ref(`users/${cpf}`).set(newUser);
-                toast('Conta criada! Ganhou R$ 1.000 de bônus.', 'success');
+                toast('Conta criada!', 'success');
                 auth.setSession(newUser);
             },
             setSession: (user) => {
@@ -920,9 +920,9 @@
                          // Seed example products if empty
                          if(currentUser.role === 'admin') {
                              const seeds = [
-                                 { name: 'iPhone 15 Pro', price: 8500, category: 'Tecnologia', img: 'fa-mobile-alt' },
+                                 { name: 'iPhone 15 Pro 128GB', price: 12999, category: 'Tecnologia', img: 'fa-mobile-alt' },
                                  { name: 'VIP Gold (30d)', price: 50, category: 'VIP', img: 'fa-crown' },
-                                 { name: 'Air Jordan', price: 1200, category: 'Roupas', img: 'fa-shoe-prints' }
+                                 { name: 'Air Jordan 1 MID', price: 3999, category: 'Roupas', img: 'fa-shoe-prints' }
                              ];
                              seeds.forEach(s => db.ref('products').push(s));
                          }
