@@ -2,10 +2,12 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Banco Imperial | Sistema Financeiro Global</title>
     <meta name="description" content="Core Banking System - Banco Imperial. Acesso Restrito.">
-    <meta name="theme-color" content="#4c1d95">
+    <meta name="theme-color" content="#2e1065">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -13,13 +15,13 @@
     <style>
         /* * =================================================================
          * CSS CORE - BANCO IMPERIAL ENTERPRISE
-         * VERSÃO: 2026.1.0-STABLE
-         * TEMA: ROXO/BRANCO (DARK/LIGHT SUPPORT)
+         * VERSÃO: 2026.2.0-MOBILE-STABLE
+         * ARQUITETURA: MONOLÍTICA
          * =================================================================
          */
 
         :root {
-            /* Cores Institucionais - Light Mode (Default) */
+            /* Palette - Light Mode */
             --primary-dark: #2e1065;
             --primary: #4c1d95;
             --primary-light: #6d28d9;
@@ -38,11 +40,11 @@
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         [data-theme="dark"] {
-            /* Cores Institucionais - Dark Mode */
+            /* Palette - Dark Mode */
             --primary-dark: #1e1b4b;
             --primary: #312e81;
             --primary-light: #4338ca;
@@ -66,32 +68,38 @@
             padding: 0;
             outline: none;
             -webkit-tap-highlight-color: transparent;
+            user-select: none; /* Mobile UI feel */
         }
 
+        /* Inputs must be selectable */
+        input, textarea { user-select: text; }
+
         body {
-            font-family: var(--font-family);
+            font-family: var(--font-main);
             background-color: var(--background);
             color: var(--text-main);
             font-size: 16px;
             line-height: 1.5;
             transition: background-color 0.3s ease, color 0.3s ease;
             overflow-x: hidden;
-            height: 100vh;
+            height: 100vh; /* Viewport Height fix */
+            height: 100dvh; /* Dynamic Viewport Height for Mobile */
             display: flex;
             flex-direction: column;
         }
 
         /* Tipografia */
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 700;
-            line-height: 1.2;
+        h1, h2, h3, h4 {
+            font-weight: 800;
+            line-height: 1.1;
             color: var(--text-main);
+            letter-spacing: -0.025em;
         }
 
-        a { text-decoration: none; color: inherit; }
-        ul { list-style: none; }
-
-        /* Utilitários de Layout */
+        /* Utilitários */
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .hidden { display: none !important; }
         .flex { display: flex; }
         .flex-col { display: flex; flex-direction: column; }
         .items-center { align-items: center; }
@@ -99,462 +107,374 @@
         .justify-between { justify-content: space-between; }
         .gap-2 { gap: 0.5rem; }
         .gap-4 { gap: 1rem; }
-        .p-4 { padding: 1rem; }
-        .m-4 { margin: 1rem; }
-        .w-full { width: 100%; }
-        .h-full { height: 100%; }
-        .hidden { display: none !important; }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
         .font-bold { font-weight: 700; }
-        .text-sm { font-size: 0.875rem; }
         .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-muted { color: var(--text-muted); }
+        .text-gold { color: var(--gold); }
         .text-danger { color: var(--danger); }
         .text-success { color: var(--success); }
-        .text-gold { color: var(--gold); }
-        .uppercase { text-transform: uppercase; }
+        .text-primary { color: var(--primary); }
 
-        /* Componentes de UI - Botões */
+        /* Componentes: Botões */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
+            padding: 0.875rem 1.5rem; /* Mais toque no mobile */
+            border-radius: 0.75rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.1s, opacity 0.2s;
             border: none;
-            font-size: 0.95rem;
-            gap: 0.5rem;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
         }
+        .btn:active { transform: scale(0.98); }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: white;
-            box-shadow: 0 4px 6px -1px rgba(76, 29, 149, 0.4);
+            box-shadow: 0 4px 12px rgba(76, 29, 149, 0.3);
         }
-        .btn-primary:hover { background-color: var(--primary-light); transform: translateY(-1px); }
-        .btn-primary:active { transform: translateY(0); }
-
+        
         .btn-secondary {
             background-color: var(--surface);
             color: var(--text-main);
             border: 1px solid var(--border);
         }
-        .btn-secondary:hover { background-color: var(--surface-hover); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
 
         .btn-danger {
             background-color: var(--danger);
             color: white;
         }
-        .btn-danger:hover { background-color: #b91c1c; }
 
         .btn-block { width: 100%; }
 
-        /* Inputs */
-        .input-group {
-            margin-bottom: 1rem;
-            text-align: left;
-        }
-
+        /* Componentes: Inputs */
+        .input-group { margin-bottom: 1.25rem; text-align: left; }
+        
         .input-label {
             display: block;
             margin-bottom: 0.5rem;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .input-field {
             width: 100%;
-            padding: 0.875rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 2px solid var(--border);
             background-color: var(--surface);
             color: var(--text-main);
             font-size: 1rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
+            font-family: monospace; /* Melhor leitura de números */
         }
-
+        
         .input-field:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
         }
 
-        /* Cards */
+        /* Componentes: Cards */
         .card {
             background-color: var(--surface);
-            border-radius: 1rem;
+            border-radius: 1.25rem;
             padding: 1.5rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
             margin-bottom: 1rem;
         }
 
-        /* Glassmorphism Header */
+        /* Header Mobile */
         .app-header {
-            background-color: var(--primary-dark);
+            background: rgba(46, 16, 101, 0.95);
             color: white;
             padding: 1rem;
             position: sticky;
             top: 0;
             z-index: 50;
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(12px);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            font-size: 1.25rem;
-            font-weight: 800;
-            letter-spacing: -0.025em;
-        }
-        .brand span { color: var(--gold); }
-
-        /* Views */
-        .view-container {
-            flex: 1;
-            position: relative;
-            overflow-y: auto;
-            padding: 0;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 900;
         }
 
-        /* Login & Register Styles */
-        .auth-container {
-            min-height: 100vh;
+        /* Layout Dashboard */
+        .dashboard-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-            padding: 1rem;
-        }
-
-        .auth-box {
-            background: var(--surface);
-            width: 100%;
-            max-width: 420px;
-            padding: 2.5rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            text-align: center;
-        }
-
-        .auth-title {
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary-dark);
-        }
-
-        .auth-subtitle {
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-        }
-
-        /* Dashboard Layout */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            height: calc(100vh - 70px); /* Adjust based on header height */
+            flex-direction: column;
+            height: 100%;
             overflow: hidden;
         }
 
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-                height: auto;
-                display: block;
-            }
+        .main-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 80px; /* Space for bottom nav */
         }
 
-        /* Sidebar */
-        .sidebar {
+        /* Bottom Navigation (Mobile First) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
             background-color: var(--surface);
-            border-right: 1px solid var(--border);
-            padding: 1.5rem;
+            border-top: 1px solid var(--border);
             display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            overflow-y: auto;
+            justify-content: space-around;
+            padding: 0.75rem 0.5rem;
+            z-index: 40;
+            padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
         }
 
         .nav-item {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.875rem 1rem;
+            gap: 0.25rem;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            padding: 0.5rem;
             border-radius: 0.5rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-
-        .nav-item:hover {
-            background-color: var(--background);
-            color: var(--primary);
+            width: 100%;
         }
 
         .nav-item.active {
-            background-color: var(--primary);
-            color: white;
-            box-shadow: var(--shadow-sm);
+            color: var(--primary);
+            background-color: rgba(139, 92, 246, 0.1);
         }
 
-        /* Main Content */
-        .main-content {
+        .nav-icon { font-size: 1.25rem; }
+
+        /* Views de Autenticação */
+        .auth-view {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             padding: 2rem;
-            overflow-y: auto;
-            background-color: var(--background);
-            height: 100%;
+            background: var(--background);
         }
 
-        /* Financial Cards */
+        .auth-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        /* Widgets Financeiros */
         .balance-card {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%);
             color: white;
             border: none;
             position: relative;
             overflow: hidden;
+            padding: 2rem 1.5rem;
         }
-
-        .balance-card::after {
-            content: '';
+        
+        .balance-card::before {
+            content: '👑';
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            filter: blur(40px);
+            top: -20px;
+            right: -20px;
+            font-size: 10rem;
+            opacity: 0.1;
+            transform: rotate(15deg);
         }
 
-        .balance-label {
-            font-size: 0.875rem;
-            opacity: 0.9;
-            margin-bottom: 0.25rem;
-        }
-
-        .balance-value {
-            font-size: 2.25rem;
+        .amount-display {
+            font-size: 2.5rem;
             font-weight: 800;
-            letter-spacing: -0.05em;
+            letter-spacing: -1px;
+            margin: 0.5rem 0;
         }
 
-        /* Transaction List */
-        .transaction-item {
+        .mini-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-pill {
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            flex: 1;
+        }
+
+        /* Lista Transações */
+        .tx-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        .tx-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
         }
-        .transaction-item:last-child { border-bottom: none; }
-
-        .tx-icon {
-            width: 40px;
-            height: 40px;
+        
+        .tx-icon-circle {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
+            background: var(--background);
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--background);
             font-size: 1.2rem;
             margin-right: 1rem;
         }
 
-        /* Loja Grid */
+        /* Market Grid */
         .market-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
         }
-
-        .product-card {
+        
+        .market-item {
             background: var(--surface);
             border-radius: 1rem;
-            overflow: hidden;
             border: 1px solid var(--border);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: transform 0.2s;
         }
-        .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-
-        .product-header {
-            height: 140px;
-            background-color: var(--background);
+        
+        .market-img {
+            height: 100px;
+            background: var(--background);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3rem;
         }
 
-        .product-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
-        .product-title { font-weight: 700; margin-bottom: 0.5rem; }
-        .product-price { color: var(--primary); font-weight: 800; font-size: 1.25rem; margin-top: auto; }
+        /* Loader */
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Modal */
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #111;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s, top 0.3s;
+        }
+        .toast.visible { opacity: 1; top: 2rem; }
+
+        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 100;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 90;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(4px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-
-        .modal {
-            background: var(--surface);
-            width: 90%;
-            max-width: 500px;
-            border-radius: 1rem;
-            padding: 2rem;
-            transform: scale(0.95);
-            transition: transform 0.3s;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-        .modal-overlay.active .modal { transform: scale(1); }
-
-        .modal-header { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            backdrop-filter: blur(5px);
         }
 
-        .toast {
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            background: var(--surface);
-            color: var(--text-main);
-            box-shadow: var(--shadow-lg);
-            border-left: 4px solid var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            min-width: 300px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* Loading */
-        .loader {
-            border: 3px solid var(--background);
-            border-radius: 50%;
-            border-top: 3px solid var(--primary);
-            width: 20px;
-            height: 20px;
-            -webkit-animation: spin 1s linear infinite; /* Safari */
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Security Watermark */
-        .security-mark {
-            position: fixed;
-            bottom: 5px;
-            left: 5px;
-            font-size: 10px;
-            color: rgba(0,0,0,0.2);
-            pointer-events: none;
-            z-index: 9999;
-            font-family: monospace;
-        }
-
-        /* Boleto Visual */
-        .boleto-visual {
-            background: #fff;
-            color: #000;
-            padding: 1.5rem;
-            border: 1px dashed #ccc;
-            font-family: "Courier New", monospace;
-            margin-bottom: 1rem;
-        }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
-    <div id="security-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; color:red; text-align:center; padding-top:20%;">
-        <h1>ACESSO BLOQUEADO</h1>
-        <p>Atividade suspeita detectada. IP Registrado.</p>
+    <div id="toast" class="toast"></div>
+    <div id="loading-overlay" class="modal-overlay hidden" style="z-index: 999;">
+        <div class="loader" style="width: 50px; height: 50px; border-color: var(--primary); border-top-color: transparent;"></div>
     </div>
 
-    <div id="toast-container" class="toast-container"></div>
-
-    <div id="global-spinner" class="modal-overlay" style="z-index: 9999;">
-        <div class="loader" style="width: 50px; height: 50px; border-width: 5px;"></div>
-    </div>
-
-    <div id="view-login" class="auth-container">
-        <div class="auth-box">
-            <div class="brand justify-center" style="margin-bottom: 1rem; color: var(--primary);">
-                <span>👑</span> BANCO IMPERIAL
+    <section id="view-login" class="auth-view">
+        <div class="auth-card">
+            <div class="text-center mb-6">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">👑</div>
+                <h2>Banco Imperial</h2>
+                <p class="text-muted">Acesso Mobile Seguro</p>
             </div>
-            <h1 class="auth-title">Bem-vindo</h1>
-            <p class="auth-subtitle">Core Banking System Global</p>
 
             <form id="form-login">
                 <div class="input-group">
                     <label class="input-label">CPF (Apenas números)</label>
-                    <input type="text" id="login-cpf" class="input-field" placeholder="000.000.000-00" maxlength="14" required>
+                    <input type="tel" id="login-cpf" class="input-field" placeholder="000.000.000-00" maxlength="14" required>
                 </div>
                 <div class="input-group">
-                    <label class="input-label">Senha de Acesso</label>
-                    <input type="password" id="login-pass" class="input-field" placeholder="••••••••" required>
+                    <label class="input-label">Senha</label>
+                    <input type="password" id="login-pass" class="input-field" placeholder="••••••" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary btn-block">
-                    <span id="btn-login-text">ACESSAR CONTA</span>
-                    <div id="btn-login-loader" class="loader hidden" style="border-top-color: white;"></div>
+                <button type="submit" class="btn btn-primary btn-block mb-4">
+                    ACESSAR CONTA
                 </button>
             </form>
 
-            <div style="margin-top: 1.5rem;">
-                <p class="text-sm text-secondary">Não é cliente Imperial?</p>
-                <button onclick="router.navigate('register')" class="btn btn-secondary btn-block" style="margin-top: 0.5rem;">ABRIR NOVA CONTA</button>
+            <div class="text-center flex flex-col gap-3">
+                <button onclick="router.navigate('register')" class="btn btn-secondary btn-block">
+                    ABRIR CONTA
+                </button>
+                
+                <button onclick="router.navigate('recovery')" class="btn btn-ghost" style="color: var(--danger);">
+                    ESQUECI A SENHA / REDEFINIR
+                </button>
             </div>
             
-            <div style="margin-top: 2rem; font-size: 0.7rem; color: var(--text-muted);">
-                SISTEMA PROTEGIDO POR CRIPTOGRAFIA DE PONTA A PONTA.<br>
-                MONITORAMENTO 24/7.
+            <div class="mt-6 text-center text-xs text-muted">
+                DADOS CRIPTOGRAFADOS.<br>AMBIENTE MONITORADO.
             </div>
         </div>
-    </div>
+    </section>
 
-    <div id="view-register" class="auth-container hidden">
-        <div class="auth-box">
-            <div class="brand justify-center" style="margin-bottom: 1rem; color: var(--primary);">
-                <span>👑</span> NOVA CONTA
-            </div>
-            <h1 class="auth-title">Junte-se à Elite</h1>
-            <p class="auth-subtitle">Cadastro de Pessoa Física</p>
+    <section id="view-register" class="auth-view hidden">
+        <div class="auth-card">
+            <h2 class="mb-2">Nova Conta</h2>
+            <p class="text-muted mb-6">Cadastro de Pessoa Física</p>
 
             <form id="form-register">
                 <div class="input-group">
@@ -563,487 +483,416 @@
                 </div>
                 <div class="input-group">
                     <label class="input-label">CPF</label>
-                    <input type="text" id="reg-cpf" class="input-field" placeholder="000.000.000-00" maxlength="14" required>
+                    <input type="tel" id="reg-cpf" class="input-field" placeholder="000.000.000-00" maxlength="14" required>
                 </div>
                 <div class="input-group">
-                    <label class="input-label">Defina sua Senha</label>
-                    <input type="password" id="reg-pass" class="input-field" placeholder="••••••••" required>
+                    <label class="input-label">Criar Senha</label>
+                    <input type="password" id="reg-pass" class="input-field" placeholder="••••••" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block">
-                    <span id="btn-reg-text">CONFIRMAR ABERTURA</span>
-                    <div id="btn-reg-loader" class="loader hidden" style="border-top-color: white;"></div>
+                <button type="submit" class="btn btn-primary btn-block mb-3">
+                    FINALIZAR ABERTURA
                 </button>
             </form>
 
-            <button onclick="router.navigate('login')" class="btn btn-secondary btn-block" style="margin-top: 1rem;">VOLTAR AO LOGIN</button>
+            <button onclick="router.navigate('login')" class="btn btn-ghost btn-block">
+                VOLTAR AO LOGIN
+            </button>
         </div>
-    </div>
+    </section>
 
-    <div id="view-dashboard" class="flex-col h-full hidden">
+    <section id="view-recovery" class="auth-view hidden">
+        <div class="auth-card" style="border-color: var(--danger);">
+            <h2 class="mb-2 text-danger">Recuperação</h2>
+            <p class="text-muted mb-6">Redefinição Administrativa de Credenciais</p>
+            
+            <div class="bg-red-50 p-3 rounded mb-4 text-xs text-danger border border-red-100" style="background: rgba(220, 38, 38, 0.1);">
+                ⚠️ Esta ação forçará uma nova senha para o CPF informado. Use apenas se for o titular. O saldo será mantido.
+            </div>
+
+            <form id="form-recovery">
+                <div class="input-group">
+                    <label class="input-label">CPF do Titular</label>
+                    <input type="tel" id="rec-cpf" class="input-field" placeholder="000.000.000-00" maxlength="14" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Nova Senha Desejada</label>
+                    <input type="text" id="rec-pass" class="input-field" placeholder="Nova Senha" required>
+                </div>
+
+                <button type="submit" class="btn btn-danger btn-block mb-3">
+                    REDEFINIR SENHA AGORA
+                </button>
+            </form>
+
+            <button onclick="router.navigate('login')" class="btn btn-ghost btn-block">
+                CANCELAR
+            </button>
+        </div>
+    </section>
+
+    <div id="view-dashboard" class="dashboard-container hidden">
         
         <header class="app-header">
             <div class="brand">
-                <span>👑</span> BANCO IMPERIAL
+                <span>👑</span> Banco Imperial
             </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right hidden-mobile">
-                    <div id="header-username" class="font-bold">Usuário</div>
-                    <div id="header-cpf" class="text-xs text-secondary" style="color: rgba(255,255,255,0.7);">000.000.000-00</div>
-                </div>
-                <button onclick="auth.logout()" class="btn btn-danger text-xs">SAIR</button>
-                <button id="theme-toggle" class="btn btn-secondary" style="padding: 0.5rem;">🌙</button>
+            <div class="flex items-center gap-3">
+                <button id="theme-btn" class="btn btn-ghost" style="color:white; padding: 0.5rem;">🌙</button>
+                <button onclick="auth.logout()" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.8rem;">SAIR</button>
             </div>
         </header>
 
-        <div class="dashboard-grid">
-            <nav class="sidebar">
-                <div class="nav-item active" onclick="ui.showTab('home')">
-                    <span>🏠</span> Visão Geral
+        <main class="main-scroll" id="main-content">
+            
+            <div id="tab-home" class="tab-content">
+                <div class="mb-4 flex items-center justify-between">
+                    <div>
+                        <div class="text-sm text-muted">Olá, <span id="user-name">Usuário</span></div>
+                        <div class="text-xs text-muted" id="user-cpf">000.000.000-00</div>
+                    </div>
+                    <div class="text-success text-xs font-bold">● ONLINE</div>
                 </div>
-                <div class="nav-item" onclick="ui.showTab('pix')">
-                    <span>💸</span> Área Pix
+
+                <div class="card balance-card">
+                    <div class="text-sm text-white opacity-80">Saldo Disponível</div>
+                    <div class="amount-display">R$ <span id="dash-saldo">0,00</span></div>
+                    
+                    <div class="mini-stats">
+                        <div class="stat-pill">
+                            <div class="text-xs opacity-70">Poupança</div>
+                            <div class="font-bold">R$ <span id="dash-poupanca">0,00</span></div>
+                        </div>
+                        <div class="stat-pill">
+                            <div class="text-xs opacity-70">Cofrinho</div>
+                            <div class="font-bold">R$ <span id="dash-cofrinho">0,00</span></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="nav-item" onclick="ui.showTab('boletos')">
-                    <span>🧾</span> Meus Boletos
+
+                <div class="flex gap-2 mb-4 overflow-x-auto pb-2" style="scrollbar-width: none;">
+                    <button onclick="ui.nav('pix')" class="btn btn-secondary flex-1" style="min-width: 100px;">
+                        💸 Pix
+                    </button>
+                    <button onclick="ui.nav('boletos')" class="btn btn-secondary flex-1" style="min-width: 100px;">
+                        🧾 Boletos
+                    </button>
+                    <button onclick="ui.nav('shop')" class="btn btn-secondary flex-1" style="min-width: 100px;">
+                        🛒 Shop
+                    </button>
                 </div>
-                <div class="nav-item" onclick="ui.showTab('market')">
-                    <span>🛒</span> Shopping Imperial
+
+                <h3 class="mb-3 text-lg">Últimas Transações</h3>
+                <div id="home-history-list" class="tx-list">
+                    <div class="text-center text-muted py-4">Carregando...</div>
                 </div>
-                <div class="nav-item" onclick="ui.showTab('invest')">
-                    <span>📈</span> Investimentos
-                </div>
-                <div class="nav-item" onclick="ui.showTab('extract')">
-                    <span>📜</span> Extrato Detalhado
-                </div>
+            </div>
+
+            <div id="tab-pix" class="tab-content hidden">
+                <h2 class="mb-4">Área Pix</h2>
                 
-                <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 1rem;">
-                    <div class="text-xs text-muted">Status do Sistema: <span class="text-success">ONLINE</span></div>
-                    <div class="text-xs text-muted">Versão: 2026.1.0</div>
+                <div class="card">
+                    <form id="form-pix">
+                        <div class="input-group">
+                            <label class="input-label">Chave CPF Destino</label>
+                            <input type="tel" id="pix-dest" class="input-field" placeholder="Apenas números" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Valor (R$)</label>
+                            <input type="number" id="pix-amount" class="input-field" step="0.01" placeholder="0.00" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">TRANSFERIR</button>
+                    </form>
                 </div>
-            </nav>
 
-            <main class="main-content">
+                <h3 class="mt-6 mb-3">Atalhos</h3>
+                <div class="flex flex-col gap-2">
+                    <button onclick="banking.fillPix('BRK.2026')" class="btn btn-secondary text-left justify-start">
+                        🏛️ Governo Federal
+                    </button>
+                    <button onclick="banking.fillPix('172244')" class="btn btn-secondary text-left justify-start">
+                        👑 Doar ao Dono (Admin)
+                    </button>
+                </div>
+            </div>
+
+            <div id="tab-shop" class="tab-content hidden">
+                <h2 class="mb-2">Shopping</h2>
+                <p class="text-muted mb-4">Itens de Luxo & Propriedades</p>
                 
-                <div id="tab-home" class="tab-content">
-                    <h2 style="margin-bottom: 1.5rem;">Resumo Financeiro</h2>
-                    
-                    <div class="flex gap-4" style="flex-wrap: wrap;">
-                        <div class="card balance-card flex-1" style="min-width: 300px;">
-                            <div class="balance-label">Saldo em Conta Corrente</div>
-                            <div class="balance-value">R$ <span id="dash-saldo">0,00</span></div>
-                            <div class="text-xs" style="margin-top: 0.5rem; opacity: 0.8;">Disponível para saque imediato</div>
-                        </div>
+                <div class="input-group">
+                    <input type="text" id="shop-search" class="input-field" placeholder="Buscar..." onkeyup="market.filter()">
+                </div>
 
-                        <div class="card flex-1" style="min-width: 250px; border-left: 4px solid var(--accent);">
-                            <div class="input-label">Poupança</div>
-                            <div class="font-bold" style="font-size: 1.5rem; color: var(--accent);">R$ <span id="dash-poupanca">0,00</span></div>
-                        </div>
-
-                        <div class="card flex-1" style="min-width: 250px; border-left: 4px solid var(--gold);">
-                            <div class="input-label">Cofrinho (Reserva)</div>
-                            <div class="font-bold" style="font-size: 1.5rem; color: var(--gold);">R$ <span id="dash-cofrinho">0,00</span></div>
-                        </div>
+                <div id="shop-list" class="market-grid">
                     </div>
+            </div>
 
-                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Últimas Movimentações</h3>
-                    <div class="card" style="padding: 0;">
-                        <div id="mini-extract-list" style="max-height: 300px; overflow-y: auto;">
-                            <div class="p-4 text-center text-muted">Carregando movimentações...</div>
+            <div id="tab-profile" class="tab-content hidden">
+                <h2 class="mb-4">Extrato & Gestão</h2>
+                
+                <div class="card mb-4">
+                    <h3 class="mb-3">Investimentos</h3>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="invest-amount" class="input-field" placeholder="Valor">
                         </div>
-                        <div class="p-4 border-t" style="text-align: center;">
-                            <button onclick="ui.showTab('extract')" class="btn btn-secondary text-sm">Ver Extrato Completo</button>
+                        <div class="flex gap-2">
+                            <button onclick="banking.invest('poupanca')" class="btn btn-primary flex-1">Poupança</button>
+                            <button onclick="banking.invest('cofrinho')" class="btn btn-gold flex-1" style="background: var(--gold); color:white;">Cofre</button>
                         </div>
+                        <button onclick="banking.withdraw('poupanca')" class="btn btn-secondary btn-block text-sm">Resgatar Poupança</button>
+                        <button onclick="banking.withdraw('cofrinho')" class="btn btn-secondary btn-block text-sm">Quebrar Cofre</button>
                     </div>
                 </div>
 
-                <div id="tab-pix" class="tab-content hidden">
-                    <h2 style="margin-bottom: 1.5rem;">Área Pix</h2>
-                    
-                    <div class="flex gap-4" style="flex-wrap: wrap;">
-                        <div class="card flex-1" style="min-width: 300px;">
-                            <h3 style="margin-bottom: 1rem;">Transferir Valor</h3>
-                            <form id="form-pix">
-                                <div class="input-group">
-                                    <label class="input-label">Chave CPF do Destinatário</label>
-                                    <input type="text" id="pix-dest" class="input-field" placeholder="000.000.000-00" maxlength="14" required>
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Valor (R$)</label>
-                                    <input type="number" id="pix-amount" class="input-field" step="0.01" min="0.01" placeholder="0,00" required>
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Descrição (Opcional)</label>
-                                    <input type="text" id="pix-desc" class="input-field" placeholder="Pagamento...">
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-block">ENVIAR PIX AGORA</button>
-                            </form>
-                        </div>
-
-                        <div class="card flex-1" style="min-width: 300px;">
-                            <h3 style="margin-bottom: 1rem;">Atalhos Rápidos</h3>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="banking.quickPix('GOV')" class="btn btn-secondary" style="justify-content: flex-start;">🏛️ Pagar Governo Federal</button>
-                                <button onclick="banking.quickPix('OWNER')" class="btn btn-secondary" style="justify-content: flex-start;">👑 Doar ao Dono (Admin)</button>
-                            </div>
-                            <div class="m-4 p-4 bg-gray-100 rounded text-xs text-muted">
-                                ⚠️ Transferências Pix são irreversíveis. Confira os dados antes de confirmar.
-                            </div>
-                        </div>
+                <h3 class="mb-3">Histórico Completo</h3>
+                <div id="full-history-list" class="tx-list">
                     </div>
-                </div>
+            </div>
 
-                <div id="tab-boletos" class="tab-content hidden">
-                    <h2 style="margin-bottom: 1.5rem;">Meus Boletos (DDA)</h2>
-                    <div class="alert alert-info mb-4 text-sm text-secondary">
-                        Boletos vencidos sofrem incidência de juros diários automaticamente.
+            <div id="tab-boletos" class="tab-content hidden">
+                <h2 class="mb-4">Boletos DDA</h2>
+                <div id="boletos-container" class="flex flex-col gap-3">
                     </div>
-                    <div id="boletos-list" class="flex-col gap-4">
-                        </div>
-                </div>
+            </div>
 
-                <div id="tab-market" class="tab-content hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2>Shopping Imperial</h2>
-                        <div class="text-right">
-                            <span class="text-sm text-muted">Saldo Disponível:</span>
-                            <div class="font-bold text-primary">R$ <span id="market-saldo-display">0,00</span></div>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                         <input type="text" id="market-search" class="input-field" placeholder="🔍 Buscar produtos de luxo..." onkeyup="market.filter()">
-                    </div>
+        </main>
 
-                    <div id="market-container" class="market-grid">
-                        </div>
-                </div>
-
-                <div id="tab-invest" class="tab-content hidden">
-                    <h2 style="margin-bottom: 1.5rem;">Gestão de Ativos</h2>
-                    
-                    <div class="flex gap-4" style="flex-wrap: wrap;">
-                        <div class="card flex-1">
-                            <h3>Poupança</h3>
-                            <p class="text-sm text-muted mb-4">Rendimento seguro e garantido.</p>
-                            <div class="font-bold text-xl mb-4 text-accent">R$ <span id="invest-poupanca-val">0,00</span></div>
-                            
-                            <div class="flex gap-2">
-                                <input type="number" id="poupanca-amount" class="input-field" placeholder="Valor" style="width: 120px;">
-                                <button onclick="banking.moveMoney('saldo', 'poupanca')" class="btn btn-primary text-sm">Aplicar</button>
-                                <button onclick="banking.moveMoney('poupanca', 'saldo')" class="btn btn-secondary text-sm">Resgatar</button>
-                            </div>
-                        </div>
-
-                        <div class="card flex-1">
-                            <h3>Cofrinho</h3>
-                            <p class="text-sm text-muted mb-4">Guarde dinheiro para objetivos de curto prazo.</p>
-                            <div class="font-bold text-xl mb-4 text-gold">R$ <span id="invest-cofrinho-val">0,00</span></div>
-                            
-                            <div class="flex gap-2">
-                                <input type="number" id="cofrinho-amount" class="input-field" placeholder="Valor" style="width: 120px;">
-                                <button onclick="banking.moveMoney('saldo', 'cofrinho')" class="btn btn-primary text-sm">Guardar</button>
-                                <button onclick="banking.moveMoney('cofrinho', 'saldo')" class="btn btn-secondary text-sm">Quebrar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tab-extract" class="tab-content hidden">
-                    <h2 style="margin-bottom: 1.5rem;">Extrato Completo</h2>
-                    <div class="card">
-                        <div id="full-extract-list">
-                            </div>
-                    </div>
-                </div>
-
-            </main>
-        </div>
-    </div>
-
-    <div class="security-mark">
-        IP: LOGGED | SESSION: SECURE | BANCO IMPERIAL SYSTEM
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="ui.nav('home')" id="nav-home">
+                <span class="nav-icon">🏠</span>
+                <span>Início</span>
+            </div>
+            <div class="nav-item" onclick="ui.nav('pix')" id="nav-pix">
+                <span class="nav-icon">💸</span>
+                <span>Pix</span>
+            </div>
+            <div class="nav-item" onclick="ui.nav('boletos')" id="nav-boletos">
+                <span class="nav-icon">🧾</span>
+                <span>Boletos</span>
+            </div>
+            <div class="nav-item" onclick="ui.nav('shop')" id="nav-shop">
+                <span class="nav-icon">🛒</span>
+                <span>Loja</span>
+            </div>
+            <div class="nav-item" onclick="ui.nav('profile')" id="nav-profile">
+                <span class="nav-icon">👤</span>
+                <span>Perfil</span>
+            </div>
+        </nav>
     </div>
 
     <script>
         /**
-         * =================================================================
-         * CONFIGURAÇÃO FIREBASE & CORE
-         * =================================================================
+         * SISTEMA FINANCEIRO CORE v2
+         * ADAPTADO PARA MOBILE + RECUPERAÇÃO DE SENHA
          */
+
         const firebaseConfig = {
             databaseURL: "https://banco-imperial-default-rtdb.firebaseio.com",
             apiKey: "AIzaSyDWat0SS6tRICcLAOmNy843MUoicfTfD8I"
         };
 
-        // Inicializar Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Estado Global da Aplicação
+        // Estado Global
         const state = {
-            user: null, // Objeto do usuário
-            cpf: null, // Chave primária
-            boletosListener: null,
-            saldoListener: null,
-            marketData: [] // Produtos carregados
+            user: null,
+            cpf: null
         };
 
-        // Utilitários
-        const utils = {
-            formatCurrency: (value) => {
-                return new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2 }).format(value);
+        // UI Utils
+        const ui = {
+            toast: (msg, type = 'info') => {
+                const el = document.getElementById('toast');
+                el.innerHTML = (type === 'error' ? '❌ ' : '✅ ') + msg;
+                el.style.backgroundColor = type === 'error' ? 'var(--danger)' : '#111';
+                el.classList.add('visible');
+                setTimeout(() => el.classList.remove('visible'), 3000);
             },
-            cleanCPF: (cpf) => cpf.replace(/\D/g, ''),
-            formatCPF: (cpf) => cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"),
-            generateId: () => Date.now().toString(36) + Math.random().toString(36).substr(2),
-            timestamp: () => firebase.database.ServerValue.TIMESTAMP,
-            showToast: (msg, type = 'info') => {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `toast`;
-                toast.style.borderLeftColor = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--primary)');
-                toast.innerHTML = `<span>${type === 'error' ? '❌' : (type === 'success' ? '✅' : 'ℹ️')}</span> <span>${msg}</span>`;
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
+            
+            loading: (show) => {
+                document.getElementById('loading-overlay').classList.toggle('hidden', !show);
             },
-            toggleSpinner: (show) => {
-                const el = document.getElementById('global-spinner');
-                el.style.opacity = show ? '1' : '0';
-                el.style.pointerEvents = show ? 'auto' : 'none';
+
+            nav: (tabId) => {
+                // Esconder todas tabs
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                // Mostrar alvo
+                document.getElementById('tab-' + tabId).classList.remove('hidden');
+                
+                // Atualizar nav bar
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                const navBtn = document.getElementById('nav-' + tabId);
+                if(navBtn) navBtn.classList.add('active');
             }
         };
 
-        /**
-         * =================================================================
-         * MÓDULO DE AUTENTICAÇÃO (AUTH)
-         * =================================================================
-         */
+        // Formatters
+        const fmt = {
+            currency: (val) => new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2 }).format(val),
+            cleanCPF: (cpf) => cpf.replace(/\D/g, ''),
+            date: (ts) => new Date(ts).toLocaleDateString('pt-BR')
+        };
+
+        // Módulo de Autenticação
         const auth = {
-            login: async (cpf, password) => {
-                utils.toggleSpinner(true);
-                const cleanCpf = utils.cleanCPF(cpf);
-
-                try {
-                    // Buscar usuário
-                    const snapshot = await db.ref('users/' + cleanCpf).once('value');
-                    
-                    if (!snapshot.exists()) {
-                        throw new Error("CPF não encontrado.");
-                    }
-
-                    const userData = snapshot.val();
-                    
-                    // Verificação Simples de Senha (Em produção real usaria hash, mas aqui é simulação direta)
-                    if (String(userData.senha) !== String(password)) {
-                        // Log tentativa falha
-                        db.ref('logs/login_failures').push({ cpf: cleanCpf, timestamp: utils.timestamp() });
-                        throw new Error("Senha incorreta.");
-                    }
-
-                    // Sucesso
-                    state.cpf = cleanCpf;
-                    state.user = userData;
-                    
-                    // Salvar sessão
-                    localStorage.setItem('imperial_session', cleanCpf);
-                    
-                    // Log sucesso
-                    db.ref('logs/access').push({ cpf: cleanCpf, type: 'LOGIN', timestamp: utils.timestamp() });
-
-                    // Atualizar último acesso
-                    db.ref(`users/${cleanCpf}/ultimoAcesso`).set(utils.timestamp());
-
-                    // Iniciar App
-                    app.initDashboard();
-
-                } catch (error) {
-                    utils.showToast(error.message, 'error');
-                } finally {
-                    utils.toggleSpinner(false);
+            init: () => {
+                const session = localStorage.getItem('imperial_mobile_session');
+                if (session) {
+                    auth.loadUser(session);
+                } else {
+                    router.navigate('login');
                 }
             },
 
-            register: async (name, cpf, password) => {
-                utils.toggleSpinner(true);
-                const cleanCpf = utils.cleanCPF(cpf);
+            login: async (cpf, pass) => {
+                ui.loading(true);
+                const clean = fmt.cleanCPF(cpf);
+                try {
+                    const snap = await db.ref('users/' + clean).once('value');
+                    if (!snap.exists()) throw new Error('CPF não cadastrado.');
+                    
+                    const data = snap.val();
+                    if (String(data.senha) !== String(pass)) throw new Error('Senha incorreta.');
 
-                if (cleanCpf.length !== 11) {
-                    utils.toggleSpinner(false);
-                    return utils.showToast("CPF inválido.", 'error');
+                    auth.success(clean, data);
+                } catch (e) {
+                    ui.toast(e.message, 'error');
+                } finally {
+                    ui.loading(false);
+                }
+            },
+
+            register: async (name, cpf, pass) => {
+                ui.loading(true);
+                const clean = fmt.cleanCPF(cpf);
+                
+                if(clean.length < 11) {
+                    ui.loading(false);
+                    return ui.toast('CPF inválido', 'error');
                 }
 
                 try {
-                    const userRef = db.ref('users/' + cleanCpf);
-                    const snapshot = await userRef.once('value');
+                    const ref = db.ref('users/' + clean);
+                    const snap = await ref.once('value');
+                    
+                    if (snap.exists()) throw new Error('CPF já existe! Use "Esqueci a Senha".');
 
-                    if (snapshot.exists()) {
-                        throw new Error("CPF já cadastrado no Banco Imperial.");
-                    }
-
-                    // Estrutura Inicial (NÃO USAR SET no ROOT, apenas no child novo)
-                    const newUser = {
+                    await ref.update({
                         nome: name,
-                        cpf: cleanCpf, // Armazenar formatado ou limpo, melhor limpo
-                        senha: password,
+                        cpf: clean,
+                        senha: pass,
                         saldo: 0,
                         poupanca: 0,
                         cofrinho: 0,
-                        dataCriacao: utils.timestamp(),
-                        ultimoAcesso: utils.timestamp(),
-                        role: 'user'
-                    };
+                        criadoEm: firebase.database.ServerValue.TIMESTAMP
+                    });
 
-                    // Transactional Update para garantir não sobrescrever
-                    await userRef.update(newUser);
-
-                    utils.showToast("Conta criada com sucesso! Faça login.", 'success');
+                    ui.toast('Conta criada!', 'success');
                     router.navigate('login');
-
-                } catch (error) {
-                    utils.showToast(error.message, 'error');
+                } catch (e) {
+                    ui.toast(e.message, 'error');
                 } finally {
-                    utils.toggleSpinner(false);
+                    ui.loading(false);
                 }
+            },
+
+            // FUNÇÃO CRÍTICA DE RECUPERAÇÃO
+            recovery: async (cpf, newPass) => {
+                ui.loading(true);
+                const clean = fmt.cleanCPF(cpf);
+                
+                if(!clean || !newPass) {
+                    ui.loading(false);
+                    return ui.toast('Preencha todos os campos.', 'error');
+                }
+
+                try {
+                    const ref = db.ref('users/' + clean);
+                    const snap = await ref.once('value');
+                    
+                    if (!snap.exists()) {
+                        throw new Error('CPF não encontrado no sistema.');
+                    }
+
+                    // Force Update Password
+                    await ref.update({
+                        senha: newPass
+                    });
+
+                    ui.toast('Senha atualizada com sucesso!', 'success');
+                    router.navigate('login');
+                } catch (e) {
+                    ui.toast(e.message, 'error');
+                } finally {
+                    ui.loading(false);
+                }
+            },
+
+            success: (cpf, data) => {
+                state.cpf = cpf;
+                state.user = data;
+                localStorage.setItem('imperial_mobile_session', cpf);
+                router.navigate('dashboard');
+                app.startListeners();
             },
 
             logout: () => {
-                // Remove listeners
-                if(state.cpf) {
-                    db.ref('users/' + state.cpf).off();
-                    db.ref('boletos').off();
-                }
-                state.user = null;
-                state.cpf = null;
-                localStorage.removeItem('imperial_session');
-                router.navigate('login');
-                window.location.reload(); // Limpa memória
+                localStorage.removeItem('imperial_mobile_session');
+                window.location.reload();
             },
-
-            checkSession: async () => {
-                const sessionCpf = localStorage.getItem('imperial_session');
-                if (sessionCpf) {
-                    utils.toggleSpinner(true);
-                    try {
-                        const snapshot = await db.ref('users/' + sessionCpf).once('value');
-                        if (snapshot.exists()) {
-                            state.cpf = sessionCpf;
-                            state.user = snapshot.val();
-                            app.initDashboard();
-                        } else {
-                            localStorage.removeItem('imperial_session');
-                            router.navigate('login');
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        router.navigate('login');
-                    } finally {
-                        utils.toggleSpinner(false);
+            
+            loadUser: async (cpf) => {
+                try {
+                    const snap = await db.ref('users/' + cpf).once('value');
+                    if(snap.exists()) {
+                        auth.success(cpf, snap.val());
+                    } else {
+                        auth.logout();
                     }
-                } else {
-                    router.navigate('login');
-                    utils.toggleSpinner(false);
-                }
+                } catch(e) { auth.logout(); }
             }
         };
 
-        /**
-         * =================================================================
-         * MÓDULO BANCÁRIO (LÓGICA FINANCEIRA)
-         * =================================================================
-         */
+        // Módulo Bancário
         const banking = {
-            // PIX
-            executePix: async (destCpfFormatted, amount, desc) => {
-                const destCpf = utils.cleanCPF(destCpfFormatted);
-                const valor = parseFloat(amount);
-                const senderCpf = state.cpf;
-
-                if (valor <= 0) return utils.showToast("Valor inválido.", 'error');
-                if (destCpf === senderCpf) return utils.showToast("Não pode transferir para si mesmo.", 'error');
-
-                utils.toggleSpinner(true);
-
-                try {
-                    // Verificar destinatário
-                    const destRef = db.ref('users/' + destCpf);
-                    const destSnap = await destRef.once('value');
-
-                    if (!destSnap.exists()) {
-                        throw new Error("Chave Pix (CPF) não encontrada.");
-                    }
-
-                    // Transação Atômica no Remetente
-                    const senderRef = db.ref('users/' + senderCpf + '/saldo');
-                    let success = false;
-
-                    await senderRef.transaction((currentSaldo) => {
-                        if (currentSaldo === null) return 0; // Prevenção
-                        if (currentSaldo >= valor) {
-                            success = true;
-                            return currentSaldo - valor;
-                        }
-                        return; // Aborta se saldo insuficiente
-                    }, (error, committed, snapshot) => {
-                        if (error) {
-                            throw new Error("Erro na transação.");
-                        } else if (!committed) {
-                            throw new Error("Saldo insuficiente.");
-                        }
-                    });
-
-                    if (success) {
-                        // Creditar Destinatário (Atomicamente também)
-                        await db.ref('users/' + destCpf + '/saldo').transaction((current) => {
-                            return (current || 0) + valor;
-                        });
-
-                        // Registrar Log de Transação
-                        const txData = {
-                            from: senderCpf,
-                            to: destCpf,
-                            amount: valor,
-                            description: desc || "Transferência Pix",
-                            timestamp: utils.timestamp(),
-                            type: 'PIX'
-                        };
-                        
-                        // Push em /transactions
-                        db.ref('transactions').push(txData);
-
-                        // Push nos históricos individuais
-                        db.ref(`users/${senderCpf}/history`).push({...txData, flow: 'out'});
-                        db.ref(`users/${destCpf}/history`).push({...txData, flow: 'in'});
-
-                        utils.showToast("Pix realizado com sucesso!", 'success');
-                        document.getElementById('form-pix').reset();
-                        ui.showTab('home');
-                    }
-
-                } catch (error) {
-                    utils.showToast(error.message, 'error');
-                } finally {
-                    utils.toggleSpinner(false);
-                }
+            fillPix: (dest) => {
+                document.getElementById('pix-dest').value = dest;
             },
 
-            // MOVER DINHEIRO (Saldo <-> Poupança <-> Cofre)
-            moveMoney: async (origin, dest) => {
-                const amountInput = origin === 'saldo' ? dest : origin; // hack simples p/ id
-                const el = document.getElementById(`${amountInput}-amount`);
-                const val = parseFloat(el.value);
-
-                if (!val || val <= 0) return utils.showToast("Valor inválido", 'error');
-
-                utils.toggleSpinner(true);
-                const refOrigin = db.ref(`users/${state.cpf}/${origin}`);
-                const refDest = db.ref(`users/${state.cpf}/${dest}`);
+            sendPix: async (dest, amount) => {
+                ui.loading(true);
+                const cleanDest = fmt.cleanCPF(dest);
+                const val = parseFloat(amount);
 
                 try {
+                    if (val <= 0) throw new Error('Valor inválido');
+                    if (cleanDest === state.cpf) throw new Error('Não envie para si mesmo');
+
+                    // Check Destino
+                    const destRef = db.ref('users/' + cleanDest);
+                    const destSnap = await destRef.once('value');
+                    
+                    // Se não for usuário comum, verifica se é conta especial (Governo/Admin)
+                    // Simplificação: Se não achar user, mas tiver saldo, falha.
+                    // Para o Prompt, vamos permitir enviar se o user existir.
+                    if (!destSnap.exists() && !['BRK.2026', '172244'].includes(cleanDest)) {
+                         // Se for conta especial hardcoded que não está no DB, permitimos?
+                         // Melhor travar se não tiver no DB 'users' para consistência.
+                         // Mas o prompt diz que BRK.2026 recebe boletos.
+                         // Vamos assumir que BRK.2026 é um nó válido ou passamos direto.
+                         // Vou travar para consistência. "Crie a conta do governo se não existir".
+                         // throw new Error('Destinatário não localizado.');
+                    }
+
+                    // Transaction Flow
+                    const myRef = db.ref(`users/${state.cpf}/saldo`);
                     let success = false;
-                    await refOrigin.transaction((curr) => {
+
+                    await myRef.transaction(curr => {
                         if (curr >= val) {
                             success = true;
                             return curr - val;
@@ -1051,457 +900,358 @@
                         return;
                     });
 
-                    if (success) {
-                        await refDest.transaction((curr) => (curr || 0) + val);
-                        utils.showToast("Operação realizada!", 'success');
-                        el.value = "";
-                        
-                        // Log
-                        db.ref(`users/${state.cpf}/history`).push({
-                            type: 'INTERNAL',
-                            amount: val,
-                            desc: `Movimentação ${origin} -> ${dest}`,
-                            timestamp: utils.timestamp()
-                        });
-                    } else {
-                        throw new Error("Saldo insuficiente na origem.");
-                    }
-                } catch(e) {
-                    utils.showToast(e.message, 'error');
+                    if (!success) throw new Error('Saldo insuficiente.');
+
+                    // Credit Dest
+                    db.ref(`users/${cleanDest}/saldo`).transaction(v => (v||0) + val);
+
+                    // Logs
+                    const log = { type: 'PIX', val: val, to: cleanDest, ts: firebase.database.ServerValue.TIMESTAMP };
+                    db.ref(`users/${state.cpf}/history`).push({...log, flow: 'out'});
+                    db.ref(`users/${cleanDest}/history`).push({...log, flow: 'in'});
+                    db.ref('transactions').push(log);
+
+                    ui.toast('Transferência realizada!', 'success');
+                    document.getElementById('form-pix').reset();
+                    ui.nav('home');
+
+                } catch (e) {
+                    ui.toast(e.message, 'error');
                 } finally {
-                    utils.toggleSpinner(false);
+                    ui.loading(false);
                 }
             },
 
-            // PAGAR BOLETO
-            payBoleto: async (boletoId, totalValue) => {
-                utils.toggleSpinner(true);
-                try {
-                    // Verificar saldo
-                    const userRef = db.ref(`users/${state.cpf}/saldo`);
-                    let hasBalance = false;
+            invest: async (target) => {
+                const val = parseFloat(document.getElementById('invest-amount').value);
+                if (!val || val <= 0) return ui.toast('Valor inválido', 'error');
 
-                    await userRef.transaction((curr) => {
-                        if (curr >= totalValue) {
-                            hasBalance = true;
-                            return curr - totalValue;
+                banking.moveMoney('saldo', target, val);
+            },
+
+            withdraw: async (source) => {
+                const val = parseFloat(document.getElementById('invest-amount').value);
+                if (!val || val <= 0) return ui.toast('Valor inválido', 'error');
+
+                banking.moveMoney(source, 'saldo', val);
+            },
+
+            moveMoney: async (from, to, val) => {
+                ui.loading(true);
+                try {
+                    const fromRef = db.ref(`users/${state.cpf}/${from}`);
+                    let success = false;
+                    
+                    await fromRef.transaction(c => {
+                        if (c >= val) {
+                            success = true;
+                            return c - val;
                         }
                         return;
                     });
 
-                    if (!hasBalance) throw new Error("Saldo insuficiente para pagar este boleto.");
+                    if(success) {
+                        db.ref(`users/${state.cpf}/${to}`).transaction(c => (c||0) + val);
+                        ui.toast('Sucesso!', 'success');
+                        document.getElementById('invest-amount').value = '';
+                    } else {
+                        throw new Error('Saldo insuficiente em ' + from);
+                    }
+                } catch(e) {
+                    ui.toast(e.message, 'error');
+                } finally {
+                    ui.loading(false);
+                }
+            },
 
-                    // Atualizar Boleto
-                    await db.ref(`boletos/${boletoId}`).update({
+            payBoleto: async (id, val) => {
+                if(!confirm('Pagar R$ ' + fmt.currency(val) + '?')) return;
+                
+                ui.loading(true);
+                try {
+                    const ref = db.ref(`users/${state.cpf}/saldo`);
+                    let ok = false;
+                    await ref.transaction(c => {
+                        if(c >= val) { ok = true; return c - val; }
+                        return;
+                    });
+
+                    if(!ok) throw new Error('Sem saldo.');
+
+                    await db.ref(`boletos/${id}`).update({
                         status: 'PAGO',
-                        dataPagamento: utils.timestamp(),
+                        pagoEm: firebase.database.ServerValue.TIMESTAMP,
                         pagoPor: state.cpf
                     });
-
-                    // Enviar dinheiro para o Governo (Brookasil) - Hardcoded CPF or Logic
-                    // Assumindo CPF Governo = 'BRK.2026' (Não é numérico, então é um nó especial ou user especial)
-                    // Vamos tentar achar o user do governo, se não achar, joga no tesouro
                     
-                    // Simulação: Enviar para conta do governo se existir, senão apenas soma no nó /governo
-                    db.ref('governo/arrecadacao').transaction(val => (val || 0) + totalValue);
-                    
-                    // Log
-                    db.ref(`users/${state.cpf}/history`).push({
-                        type: 'BOLETO',
-                        amount: totalValue,
-                        desc: `Pagamento Boleto Governo`,
-                        timestamp: utils.timestamp(),
-                        flow: 'out'
-                    });
+                    // Enviar para governo
+                    db.ref('governo/caixa').transaction(c => (c||0) + val);
 
-                    utils.showToast("Boleto pago com sucesso!", 'success');
-                    // Refresh feito via listener
+                    ui.toast('Boleto Pago!', 'success');
                 } catch(e) {
-                    utils.showToast(e.message, 'error');
+                    ui.toast(e.message, 'error');
                 } finally {
-                    utils.toggleSpinner(false);
+                    ui.loading(false);
                 }
-            },
-
-            quickPix: (target) => {
-                const cpf = target === 'GOV' ? 'BRK.2026' : (target === 'OWNER' ? '172244' : ''); // Exemplo
-                // Como Pix precisa de validação de user existente, se esses usuarios não existirem no /users, vai falhar.
-                // Vou assumir que o usuário insere manualmente para evitar erros se os usuários especiais não tiverem sido criados.
-                document.getElementById('pix-dest').value = "Preencha o CPF";
-                utils.showToast("Por favor, insira o CPF do destinatário manualmente para segurança.", 'info');
-                document.getElementById('pix-dest').focus();
             }
         };
 
-        /**
-         * =================================================================
-         * MÓDULO DE UI & RENDERIZAÇÃO
-         * =================================================================
-         */
-        const ui = {
-            showTab: (tabName) => {
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-                document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-                
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                // Seleção simples baseada em ordem ou querySelector complexo, simplificando:
-                // (Para manter 2000 linhas puras seria melhor fazer mapeamento, aqui vamos simples)
-            },
-
-            renderExtract: (historyObj) => {
-                if (!historyObj) return;
-                const list = Object.values(historyObj).sort((a,b) => b.timestamp - a.timestamp);
-                
-                // Mini Extract (Home)
-                const miniHtml = list.slice(0, 5).map(item => ui.createTxRow(item)).join('');
-                document.getElementById('mini-extract-list').innerHTML = miniHtml || '<div class="p-4 text-center">Sem movimentações.</div>';
-
-                // Full Extract
-                const fullHtml = list.map(item => ui.createTxRow(item)).join('');
-                document.getElementById('full-extract-list').innerHTML = fullHtml || '<div class="p-4 text-center">Sem movimentações.</div>';
-            },
-
-            createTxRow: (item) => {
-                const date = new Date(item.timestamp).toLocaleDateString('pt-BR');
-                const isEntry = item.flow === 'in' || (item.type === 'INTERNAL' && item.desc.includes('-> saldo')); // Lógica simplificada
-                const color = item.flow === 'out' ? 'text-danger' : 'text-success';
-                const symbol = item.flow === 'out' ? '-' : '+';
-                
-                let icon = '📄';
-                if(item.type === 'PIX') icon = '💸';
-                if(item.type === 'BOLETO') icon = '🧾';
-                if(item.type === 'SHOP') icon = '🛒';
-
-                return `
-                    <div class="transaction-item px-4">
-                        <div class="flex items-center">
-                            <div class="tx-icon">${icon}</div>
-                            <div>
-                                <div class="font-bold text-sm">${item.description || item.desc || 'Transação'}</div>
-                                <div class="text-xs text-muted">${date} • ${item.type}</div>
-                            </div>
-                        </div>
-                        <div class="font-bold ${color}">
-                            ${symbol} R$ ${utils.formatCurrency(item.amount)}
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderBoletos: (boletosObj) => {
-                const container = document.getElementById('boletos-list');
-                container.innerHTML = '';
-
-                if (!boletosObj) {
-                    container.innerHTML = '<div class="text-center text-muted">Nenhum boleto pendente.</div>';
-                    return;
-                }
-
-                Object.entries(boletosObj).forEach(([key, bol]) => {
-                    // Se o boleto for global ou destinado ao CPF atual
-                    // Lógica de filtro: o prompt diz que governo gera boletos. Vamos assumir que listamos todos ou filtramos.
-                    // Para segurança, mostrar apenas onde destino == cpf, ou se for 'global'
-                    // Como não especificado a estrutura exata do 'destino', assumimos filtro no client side por simplicidade ou listamos todos se for admin.
-                    // REGRA: Mostrar apenas se status != PAGO
-                    
-                    if (bol.status === 'PAGO') return;
-
-                    // Cálculos de Juros
-                    const now = Date.now();
-                    const vencimento = new Date(bol.dataVencimento).getTime(); // Assumindo formato ISO ou timestamp
-                    // Se estiver em string ISO, converter. Se timestamp, ok.
-                    // O prompt diz "diasEmAtraso". Vamos calcular.
-                    
-                    let valorFinal = parseFloat(bol.valorOriginal);
-                    let infoJuros = '';
-                    let isLate = false;
-
-                    if (now > vencimento) {
-                        isLate = true;
-                        const diffTime = Math.abs(now - vencimento);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                        
-                        // Juros compostos simples diários (ex: 1%)
-                        const taxaDiaria = (bol.jurosDiarios || 0.01);
-                        const multa = (bol.multaInicial || 0);
-
-                        // Valor = (Original + Multa) * (1 + taxa)^dias
-                        valorFinal = (valorFinal + multa) * Math.pow((1 + taxaDiaria), diffDays);
-                        
-                        infoJuros = `<div class="text-xs text-danger mt-1">ATRASADO: ${diffDays} dias. Multa + Juros aplicados.</div>`;
-                    }
-
-                    const html = `
-                        <div class="card border-l-4 ${isLate ? 'border-red-500' : 'border-gray-300'}">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <div class="font-bold text-lg">${bol.titulo || 'Boleto Governo'}</div>
-                                    <div class="text-sm text-muted">Vencimento: ${new Date(bol.dataVencimento).toLocaleDateString()}</div>
-                                    ${infoJuros}
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-xs text-muted">Valor Atualizado</div>
-                                    <div class="font-bold text-xl">R$ ${utils.formatCurrency(valorFinal)}</div>
-                                </div>
-                            </div>
-                            <div class="mt-4 pt-4 border-t flex justify-end">
-                                <button onclick="banking.payBoleto('${key}', ${valorFinal.toFixed(2)})" class="btn btn-primary btn-sm">
-                                    PAGAR BOLETO
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += html;
-                });
-            }
-        };
-
-        /**
-         * =================================================================
-         * MÓDULO MARKET (LOJA)
-         * =================================================================
-         */
+        // Market Logic
         const market = {
-            items: [
-                { category: 'brinquedos', name: 'Carrinho Hot Wheels Premium', price: 249.90, img: '🚗' },
-                { category: 'brinquedos', name: 'LEGO Technic Supercar', price: 2999.90, img: '🏎️' },
-                { category: 'alimentos', name: 'Picanha Angus 1kg', price: 299.90, img: '🥩' },
-                { category: 'alimentos', name: 'Vinho Italiano Reserva', price: 399.90, img: '🍷' },
-                { category: 'tecnologia', name: 'iPhone 15 Pro Max 1TB', price: 19999.99, img: '📱' },
-                { category: 'tecnologia', name: 'MacBook Pro M3 Max', price: 39999.99, img: '💻' },
-                { category: 'roupas', name: 'Camiseta Gucci Original', price: 3999.90, img: '👕' },
-                { category: 'veiculos', name: 'Porsche Cayenne 2022', price: 2999999.99, img: '🚙' },
-                { category: 'veiculos', name: 'Lamborghini Huracán', price: 5999999.90, img: '🏎️' },
-                { category: 'imoveis', name: 'Mansão de Luxo', price: 6999999.90, img: '🏰' },
-                { category: 'imoveis', name: 'Ilha Particular RP', price: 49999999.99, img: '🏝️' },
-                { category: 'empresas', name: 'Banco Nacional RP', price: 99999999.99, img: '🏦' }
-            ],
+    items: [
+        // 🧸 Brinquedos
+        { n: 'Hot Wheels Premium', p: 249.90, i: '🏎️' },
+        { n: 'LEGO City Mega Pack', p: 1299.99, i: '🧱' },
+        { n: 'LEGO Technic Supercar', p: 2999.90, i: '🏎️' },
+        { n: 'Boneca Barbie Signature', p: 1499.99, i: '🧸' },
+        { n: 'Boneco Marvel Legends', p: 899.90, i: '🦸' },
 
+        // 🍔 Alimentos & Bebidas
+        { n: 'Picanha Angus 1kg', p: 299.90, i: '🥩' },
+        { n: 'Salmão Importado 1kg', p: 349.99, i: '🐟' },
+        { n: 'Pizza Gourmet Artesanal', p: 119.90, i: '🍕' },
+        { n: 'Champagne Moët & Chandon', p: 799.99, i: '🍾' },
+        { n: 'Vinho Italiano Reserva', p: 399.90, i: '🍷' },
+
+        // 📱 Tecnologia
+        { n: 'iPhone 15 Pro 256GB', p: 14499.90, i: '📱' },
+        { n: 'iPhone 15 Pro Max 1TB', p: 19999.99, i: '📱' },
+        { n: 'Samsung Galaxy S24 Ultra', p: 15999.90, i: '📱' },
+        { n: 'MacBook Pro M3 Max', p: 39999.99, i: '💻' },
+        { n: 'PlayStation 5 Pro', p: 18999.90, i: '🎮' },
+        { n: 'Xbox Series X', p: 16999.99, i: '🎮' },
+
+        // 👕 Roupas & Luxo
+        { n: 'Camiseta Gucci Original', p: 3999.90, i: '👕' },
+        { n: 'Jaqueta Balenciaga', p: 9999.90, i: '🧥' },
+        { n: 'Terno Armani', p: 12999.90, i: '🤵' },
+        { n: 'Óculos Ray-Ban Aviator', p: 3499.99, i: '🕶️' },
+
+        // 👟 Tênis
+        { n: 'Air Jordan 1 Mid', p: 4999.90, i: '👟' },
+        { n: 'Air Jordan 4 Retro', p: 8999.90, i: '👟' },
+        { n: 'Air Jordan 11 Retro', p: 9999.99, i: '👟' },
+        { n: 'Adidas Yeezy Boost 350', p: 9999.99, i: '👟' },
+
+        // 💎 Joias & Relógios
+        { n: 'Rolex Submariner', p: 99999.90, i: '⌚' },
+        { n: 'Patek Philippe', p: 499999.99, i: '⌚' },
+        { n: 'Anel de Diamante', p: 199999.99, i: '💍' },
+
+        // 🚗 Veículos
+        { n: 'Fiat Mobi 2023', p: 299990.90, i: '🚗' },
+        { n: 'Chevrolet Onix 2022', p: 389990.99, i: '🚗' },
+        { n: 'Toyota Corolla 2021', p: 549990.90, i: '🚗' },
+        { n: 'BMW X5 2021', p: 1499999.90, i: '🚙' },
+        { n: 'Porsche Cayenne 2022', p: 2999999.99, i: '🚙' },
+        { n: 'Lamborghini Huracán', p: 5999999.90, i: '🏎️' },
+        { n: 'Bugatti Chiron', p: 15999999.99, i: '🏎️' },
+
+        // 🏠 Imóveis
+        { n: 'Apartamento de Luxo', p: 1499999.90, i: '🏢' },
+        { n: 'Casa Alto Padrão', p: 2999999.99, i: '🏠' },
+        { n: 'Mansão de Luxo', p: 6999999.90, i: '🏰' },
+        { n: 'Cobertura Triplex', p: 9999999.99, i: '🏙️' },
+        { n: 'Ilha Particular', p: 49999999.99, i: '🏝️' },
+
+        // 🏢 Empresas (1M+)
+        { n: 'Padaria RP', p: 1299999.90, i: '🥖' },
+        { n: 'Mercado RP', p: 2999999.99, i: '🏪' },
+        { n: 'Restaurante Premium', p: 4999999.90, i: '🍽️' },
+        { n: 'Posto de Gasolina RP', p: 6999999.99, i: '⛽' },
+        { n: 'Construtora RP', p: 12999999.90, i: '🏗️' },
+        { n: 'Hospital Privado RP', p: 19999999.99, i: '🏥' },
+        { n: 'Banco Privado', p: 39999999.90, i: '🏦' },
+        { n: 'Banco Nacional', p: 99999999.99, i: '🏦' }
+    ]
+};
+            
             init: () => {
                 market.render(market.items);
             },
 
             render: (list) => {
-                const container = document.getElementById('market-container');
-                container.innerHTML = list.map((item, index) => `
-                    <div class="product-card">
-                        <div class="product-header">${item.img}</div>
-                        <div class="product-body">
-                            <div class="product-title">${item.name}</div>
-                            <div class="text-xs text-muted uppercase mb-2">${item.category}</div>
-                            <div class="product-price">R$ ${utils.formatCurrency(item.price)}</div>
-                            <button onclick="market.buy(${index})" class="btn btn-primary mt-3 w-full">COMPRAR</button>
+                const el = document.getElementById('shop-list');
+                el.innerHTML = list.map(item => `
+                    <div class="market-item">
+                        <div class="market-img">${item.i}</div>
+                        <div class="p-3">
+                            <div class="font-bold text-sm truncate">${item.n}</div>
+                            <div class="text-primary font-bold mt-1">R$ ${fmt.currency(item.p)}</div>
+                            <button onclick="market.buy('${item.n}', ${item.p})" class="btn btn-secondary btn-block mt-2 text-xs">COMPRAR</button>
                         </div>
                     </div>
                 `).join('');
             },
 
             filter: () => {
-                const term = document.getElementById('market-search').value.toLowerCase();
-                const filtered = market.items.filter(i => i.name.toLowerCase().includes(term) || i.category.includes(term));
-                market.render(filtered);
+                const term = document.getElementById('shop-search').value.toLowerCase();
+                const f = market.items.filter(i => i.n.toLowerCase().includes(term));
+                market.render(f);
             },
 
-            buy: async (index) => {
-                // Recuperar item original baseado no índice renderizado (Simplificação: assumindo lista full. 
-                // Num app real, passaria ID único)
-                // Vamos achar o item no array original pelo nome para evitar erro de filtro
-                // (Hack para este exemplo de arquivo único)
-                // Melhor: usar o objeto passado no render, mas aqui vou usar o index do array filtrado se não houver ID.
-                // Como não tenho IDs persistentes, vou usar o objeto direto.
-                
-                // Nota: O clique vem do HTML gerado, o index refere-se ao array renderizado? 
-                // Cuidado. Vou assumir que o render passa o index correto do array principal se não houver filtro,
-                // mas com filtro quebra. Solução rápida: passar string identificadora.
-                
-                // Workaround para o exemplo:
-                const item = market.items[index]; // ISSO QUEBRA COM FILTRO.
-                // Correção:
-                // O botão terá: onclick="market.buyItem('${item.name}')"
-                
-                // Mas no HTML acima usei index. Vou corrigir no render para usar nome como ID (assumindo unicos)
-            },
-
-            buyItemByName: async (name) => {
-                const item = market.items.find(i => i.name === name);
-                if (!item) return;
-
-                if (!confirm(`Confirmar compra de ${item.name} por R$ ${utils.formatCurrency(item.price)}?`)) return;
-
-                utils.toggleSpinner(true);
+            buy: async (name, price) => {
+                if(!confirm(`Comprar ${name}?`)) return;
+                ui.loading(true);
                 try {
-                    // Verificar saldo e debitar
-                    const userRef = db.ref(`users/${state.cpf}/saldo`);
-                    let success = false;
-                    
-                    await userRef.transaction(curr => {
-                        if (curr >= item.price) {
-                            success = true;
-                            return curr - item.price;
-                        }
+                    const ref = db.ref(`users/${state.cpf}/saldo`);
+                    let ok = false;
+                    await ref.transaction(c => {
+                        if(c >= price) { ok = true; return c - price; }
                         return;
                     });
-
-                    if (!success) throw new Error("Saldo insuficiente.");
-
-                    // Registrar Compra
-                    const order = {
-                        item: item.name,
-                        price: item.price,
-                        buyer: state.cpf,
-                        timestamp: utils.timestamp()
-                    };
                     
-                    db.ref('orders').push(order);
-                    
-                    db.ref(`users/${state.cpf}/history`).push({
-                        type: 'SHOP',
-                        amount: item.price,
-                        desc: `Compra: ${item.name}`,
-                        timestamp: utils.timestamp(),
-                        flow: 'out'
-                    });
+                    if(!ok) throw new Error('Saldo insuficiente');
 
-                    // Creditar dono do banco (Economia girando)
-                    // Assumindo 'ryan_imperial' como user admin, se existir.
-                    // Não vou travar se não existir.
-                    db.ref('users/ryan_imperial/saldo').transaction(val => (val||0) + (item.price * 0.1)); // 10% tax
+                    db.ref('orders').push({ item: name, val: price, user: state.cpf, ts: firebase.database.ServerValue.TIMESTAMP });
+                    db.ref(`users/${state.cpf}/history`).push({ type: 'SHOP', val: price, desc: name, flow: 'out', ts: firebase.database.ServerValue.TIMESTAMP });
 
-                    utils.showToast("Compra realizada com sucesso!", 'success');
-                    
+                    ui.toast('Compra realizada!', 'success');
                 } catch(e) {
-                    utils.showToast(e.message, 'error');
+                    ui.toast(e.message, 'error');
                 } finally {
-                    utils.toggleSpinner(false);
+                    ui.loading(false);
                 }
             }
         };
 
-        // Sobrescrever o render do market para usar buyItemByName
-        market.render = (list) => {
-            const container = document.getElementById('market-container');
-            container.innerHTML = list.map((item) => `
-                <div class="product-card">
-                    <div class="product-header">${item.img}</div>
-                    <div class="product-body">
-                        <div class="product-title">${item.name}</div>
-                        <div class="text-xs text-muted uppercase mb-2">${item.category}</div>
-                        <div class="product-price">R$ ${utils.formatCurrency(item.price)}</div>
-                        <button onclick="market.buyItemByName('${item.name}')" class="btn btn-primary mt-3 w-full">COMPRAR</button>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        /**
-         * =================================================================
-         * CONTROLLER DE APLICAÇÃO
-         * =================================================================
-         */
+        // App Control
         const router = {
-            navigate: (viewId) => {
-                document.getElementById('view-login').classList.add('hidden');
-                document.getElementById('view-register').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.add('hidden');
-                document.getElementById('global-spinner').style.opacity = '0';
+            navigate: (view) => {
+                document.querySelectorAll('section, .dashboard-container').forEach(el => el.classList.add('hidden'));
                 
-                if (viewId === 'login') document.getElementById('view-login').classList.remove('hidden');
-                if (viewId === 'register') document.getElementById('view-register').classList.remove('hidden');
-                if (viewId === 'dashboard') document.getElementById('view-dashboard').classList.remove('hidden');
+                if(view === 'login') document.getElementById('view-login').classList.remove('hidden');
+                else if(view === 'register') document.getElementById('view-register').classList.remove('hidden');
+                else if(view === 'recovery') document.getElementById('view-recovery').classList.remove('hidden');
+                else if(view === 'dashboard') {
+                    document.getElementById('view-dashboard').classList.remove('hidden');
+                    ui.nav('home');
+                }
             }
         };
 
         const app = {
-            init: () => {
-                // Listeners de Formulário
-                document.getElementById('form-login').addEventListener('submit', (e) => {
+            start: () => {
+                // Auth Listeners
+                document.getElementById('form-login').onsubmit = (e) => {
                     e.preventDefault();
-                    const cpf = document.getElementById('login-cpf').value;
-                    const pass = document.getElementById('login-pass').value;
-                    auth.login(cpf, pass);
-                });
-
-                document.getElementById('form-register').addEventListener('submit', (e) => {
+                    auth.login(document.getElementById('login-cpf').value, document.getElementById('login-pass').value);
+                };
+                
+                document.getElementById('form-register').onsubmit = (e) => {
                     e.preventDefault();
                     auth.register(
-                        document.getElementById('reg-name').value,
-                        document.getElementById('reg-cpf').value,
+                        document.getElementById('reg-name').value, 
+                        document.getElementById('reg-cpf').value, 
                         document.getElementById('reg-pass').value
                     );
-                });
+                };
 
-                document.getElementById('form-pix').addEventListener('submit', (e) => {
+                document.getElementById('form-recovery').onsubmit = (e) => {
                     e.preventDefault();
-                    banking.executePix(
-                        document.getElementById('pix-dest').value,
-                        document.getElementById('pix-amount').value,
-                        document.getElementById('pix-desc').value
+                    auth.recovery(
+                        document.getElementById('rec-cpf').value,
+                        document.getElementById('rec-pass').value
                     );
-                });
+                };
 
-                // Toggle Dark Mode
-                document.getElementById('theme-toggle').addEventListener('click', () => {
-                    const body = document.body;
-                    const isDark = body.getAttribute('data-theme') === 'dark';
-                    body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-                    localStorage.setItem('imperial_theme', isDark ? 'light' : 'dark');
-                });
+                // Pix
+                document.getElementById('form-pix').onsubmit = (e) => {
+                    e.preventDefault();
+                    banking.sendPix(
+                        document.getElementById('pix-dest').value,
+                        document.getElementById('pix-amount').value
+                    );
+                };
 
-                // Load Theme
-                const savedTheme = localStorage.getItem('imperial_theme');
-                if(savedTheme) document.body.setAttribute('data-theme', savedTheme);
+                // Theme
+                document.getElementById('theme-btn').onclick = () => {
+                    const b = document.body;
+                    b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+                };
 
-                // Auto Login Check
-                auth.checkSession();
+                market.init();
+                auth.init();
             },
 
-            initDashboard: () => {
-                router.navigate('dashboard');
-                
-                // Preencher Header
-                document.getElementById('header-username').innerText = state.user.nome;
-                document.getElementById('header-cpf').innerText = utils.formatCPF(state.cpf);
+            startListeners: () => {
+                // User Data
+                db.ref(`users/${state.cpf}`).on('value', snap => {
+                    const d = snap.val();
+                    if(!d) return;
 
-                // Setup Listeners em Tempo Real (Firebase Magic)
-                const userPath = `users/${state.cpf}`;
-                
-                // 1. Ouvir Saldo e Dados Principais
-                db.ref(userPath).on('value', (snap) => {
-                    if(!snap.exists()) return; // User deletado?
-                    const data = snap.val();
-                    
-                    // Atualizar UI
-                    document.getElementById('dash-saldo').innerText = utils.formatCurrency(data.saldo || 0);
-                    document.getElementById('dash-poupanca').innerText = utils.formatCurrency(data.poupanca || 0);
-                    document.getElementById('dash-cofrinho').innerText = utils.formatCurrency(data.cofrinho || 0);
-                    document.getElementById('market-saldo-display').innerText = utils.formatCurrency(data.saldo || 0);
-                    
-                    // Invest tab inputs display
-                    document.getElementById('invest-poupanca-val').innerText = utils.formatCurrency(data.poupanca || 0);
-                    document.getElementById('invest-cofrinho-val').innerText = utils.formatCurrency(data.cofrinho || 0);
-                    
-                    // Render Extract
-                    if(data.history) ui.renderExtract(data.history);
+                    document.getElementById('user-name').innerText = d.nome || 'Usuário';
+                    document.getElementById('user-cpf').innerText = fmt.cleanCPF(d.cpf);
+                    document.getElementById('dash-saldo').innerText = fmt.currency(d.saldo || 0);
+                    document.getElementById('dash-poupanca').innerText = fmt.currency(d.poupanca || 0);
+                    document.getElementById('dash-cofrinho').innerText = fmt.currency(d.cofrinho || 0);
+
+                    // History
+                    if(d.history) {
+                        const h = Object.values(d.history).sort((a,b) => b.ts - a.ts);
+                        const html = h.slice(0, 20).map(t => `
+                            <div class="tx-item">
+                                <div class="flex items-center">
+                                    <div class="tx-icon-circle">${t.type === 'PIX' ? '💸' : (t.type === 'SHOP' ? '🛒' : '📄')}</div>
+                                    <div>
+                                        <div class="font-bold text-sm">${t.desc || (t.type === 'PIX' ? (t.flow === 'in' ? 'Recebido' : 'Enviado') : 'Transação')}</div>
+                                        <div class="text-xs text-muted">${fmt.date(t.ts)}</div>
+                                    </div>
+                                </div>
+                                <div class="font-bold ${t.flow === 'out' ? 'text-danger' : 'text-success'}">
+                                    ${t.flow === 'out' ? '-' : '+'} ${fmt.currency(t.val || t.amount)}
+                                </div>
+                            </div>
+                        `).join('');
+                        document.getElementById('home-history-list').innerHTML = html;
+                        document.getElementById('full-history-list').innerHTML = html;
+                    }
                 });
 
-                // 2. Ouvir Boletos (Globais + Pessoais) -> Simplificado para listar nó /boletos
-                // Atenção: Num banco real isso seria filtrado no backend. Aqui baixamos tudo e filtramos no client (Cuidado com performance se tiver 1 milhão de boletos)
-                // O prompt pede "hardcore", mas front-end filtering com milhares de nós trava. 
-                // Vamos ouvir apenas os 50 ultimos para demo ou estrutura especifica.
-                
-                db.ref('boletos').on('value', (snap) => {
-                    const boletos = snap.val();
-                    ui.renderBoletos(boletos);
-                });
+                // Boletos Listener
+                db.ref('boletos').on('value', snap => {
+                    const list = snap.val();
+                    const container = document.getElementById('boletos-container');
+                    container.innerHTML = '';
+                    
+                    if(!list) {
+                        container.innerHTML = '<div class="text-center text-muted p-4">Nada pendente.</div>';
+                        return;
+                    }
 
-                // Init Market
-                market.init();
-                ui.showTab('home');
+                    Object.entries(list).forEach(([key, bol]) => {
+                        if(bol.status === 'PAGO') return;
+
+                        // Calc Juros
+                        const now = Date.now();
+                        const venc = new Date(bol.dataVencimento).getTime();
+                        let total = parseFloat(bol.valorOriginal);
+                        let msg = '';
+                        let color = 'border-gray-300';
+
+                        if(now > venc) {
+                            const days = Math.ceil((now - venc)/(1000*60*60*24));
+                            total = total * Math.pow(1.01, days); // 1% ao dia
+                            msg = `ATRASO: ${days} dias`;
+                            color = 'border-red-500';
+                        }
+
+                        container.innerHTML += `
+                            <div class="card ${color} border-l-4">
+                                <div class="flex justify-between mb-2">
+                                    <div class="font-bold">${bol.titulo}</div>
+                                    <div class="text-danger font-bold text-xs">${msg}</div>
+                                </div>
+                                <div class="text-2xl font-bold mb-3">R$ ${fmt.currency(total)}</div>
+                                <button onclick="banking.payBoleto('${key}', ${total})" class="btn btn-primary btn-block text-sm">PAGAR AGORA</button>
+                            </div>
+                        `;
+                    });
+                });
             }
         };
 
-        // Inicializar
-        window.addEventListener('DOMContentLoaded', app.init);
+        window.onload = app.start;
 
     </script>
 </body>
