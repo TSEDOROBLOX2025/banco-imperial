@@ -1766,10 +1766,14 @@
         }
 
         function hideModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            if (modalId === 'loginModal' || modalId === 'createAccountModal') {
-                document.getElementById('initialScreen').style.display = 'block';
-            }
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    // Mostrar tela inicial novamente
+    if (modalId === 'loginModal' || modalId === 'createAccountModal') {
+        document.getElementById('initialScreen').style.display = 'block';
+    }
         }
 
         function showTab(tabName) {
@@ -2064,8 +2068,9 @@
             
             showAlert('Login realizado com sucesso!', 'success');
         }
-
-        function createAccount() {
+                
+        
+function createAccount() {
     const cpf = document.getElementById('newCPF').value.replace(/\D/g, '');
     const name = document.getElementById('newName').value.trim();
     const password = document.getElementById('newPassword').value;
@@ -2100,88 +2105,85 @@
     
     showLoading('Criando conta...');
     
-    // CORREÇÃO: Usar transaction para verificar e criar atomicamente
-    const userRef = database.ref('/users/' + cpf);
-    
-    userRef.transaction(currentData => {
-        // Se já existir dados, aborta a transação
-        if (currentData !== null) {
-            return currentData; // Mantém os dados existentes
-        }
-        
-        // Se não existir, cria nova conta
-        return {
-            cpf: cpf,
-            name: name,
-            password: password,
-            saldo: 0,
-            poupanca: 0,
-            cofrinho: 0,
-            type: 'client',
-            created: Date.now(),
-            lastLogin: Date.now()
-        };
-    }, (error, committed, snapshot) => {
-        hideLoading();
-        
-        if (error) {
-            showAlert('Erro ao criar conta: ' + error.message, 'danger');
-            return;
-        }
-        
-        if (!committed) {
-            showAlert('CPF já cadastrado. Use a opção "Entrar".', 'warning');
-            return;
-        }
-        
-        // Sucesso - conta criada
-        const newUser = snapshot.val();
-        
-        // Criar logs e extrato inicial
-        const timestamp = Date.now();
-        const updates = {};
-        
-        // Log de criação de conta
-        updates['/logs/' + database.ref().push().key] = {
-            type: 'account_created',
-            cpf: cpf,
-            name: name,
-            timestamp: timestamp,
-            ip: 'web_client'
-        };
-        
-        // Extrato inicial
-        updates['/extratos/' + cpf + '/' + database.ref().push().key] = {
-            type: 'account_creation',
-            description: 'Abertura de conta',
-            amount: 0,
-            balance: 0,
-            timestamp: timestamp,
-            status: 'completed'
-        };
-        
-        // Aplicar updates
-        database.ref().update(updates)
-            .then(() => {
-                showAlert('Conta criada com sucesso! Faça login para continuar.', 'success');
-                
-                // Limpar formulário
-                document.getElementById('newCPF').value = '';
-                document.getElementById('newName').value = '';
-                document.getElementById('newPassword').value = '';
-                document.getElementById('confirmPassword').value = '';
-                document.getElementById('acceptTerms').checked = false;
-                
-                hideModal('createAccountModal');
-                showLogin();
-            })
-            .catch(error => {
-                showAlert('Erro ao registrar logs da conta: ' + error.message, 'warning');
-                // Mesmo assim a conta foi criada, então mostramos sucesso
-                hideModal('createAccountModal');
-                showLogin();
-            });
-    });
+    // PRIMEIRO: Verificar se CPF já existe
+    database.ref('/users/' + cpf).once('value')
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                hideLoading();
+                showAlert('CPF já cadastrado. Use a opção "Entrar".', 'warning');
+                return;
+            }
+            
+            // CPF não existe, criar nova conta
+            const newUser = {
+                cpf: cpf,
+                name: name,
+                password: password,
+                saldo: 0,
+                poupanca: 0,
+                cofrinho: 0,
+                type: 'client',
+                created: Date.now(),
+                lastLogin: Date.now()
+            };
+            
+            // CRIAR NO /users - usando set() em vez de transaction()
+            return database.ref('/users/' + cpf).set(newUser);
+        })
+        .then(() => {
+            // Conta criada com sucesso no /users
+            console.log('Conta criada com sucesso em /users/' + cpf);
+            
+            // Agora criar logs e extrato
+            const timestamp = Date.now();
+            const updates = {};
+            
+            // Log de criação de conta
+            updates['/logs/' + database.ref().push().key] = {
+                type: 'account_created',
+                cpf: cpf,
+                name: name,
+                timestamp: timestamp,
+                ip: 'web_client'
+            };
+            
+            // Extrato inicial
+            updates['/extratos/' + cpf + '/' + database.ref().push().key] = {
+                type: 'account_creation',
+                description: 'Abertura de conta',
+                amount: 0,
+                balance: 0,
+                timestamp: timestamp,
+                status: 'completed'
+            };
+            
+            // Aplicar updates dos logs e extrato
+            return database.ref().update(updates);
+        })
+        .then(() => {
+            hideLoading();
+            showAlert('Conta criada com sucesso! Faça login para continuar.', 'success');
+            
+            // Limpar formulário
+            document.getElementById('newCPF').value = '';
+            document.getElementById('newName').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('acceptTerms').checked = false;
+            
+            hideModal('createAccountModal');
+            showLogin();
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Erro completo:', error);
+            
+            if (error.message && error.message.includes('permission')) {
+                showAlert('Erro de permissão no Firebase. Verifique as regras.', 'danger');
+            } else {
+                showAlert('Erro ao criar conta: ' + error.message, 'danger');
+            }
+        });
         }
          
         function logout() {
